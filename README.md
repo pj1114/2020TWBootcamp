@@ -3,3 +3,5 @@
 ## Members
 - Patrick
 - Sean
+- Erica
+
