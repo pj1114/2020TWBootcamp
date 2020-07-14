@@ -2,3 +2,4 @@
 
 ## Members
 - Patrick
+- Erica
