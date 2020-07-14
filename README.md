@@ -1,7 +1,7 @@
 # 2020TWBootcamp
 
-## Members
+## Member
+- Lawrence
 - Patrick
 - Sean
 - Erica
-
