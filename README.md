@@ -1,4 +1,4 @@
-# 2020TWBootcamp
+# ZaiLaGan - A chinese spelling error corrector
 
 ## Team Members
 - Lawrence
