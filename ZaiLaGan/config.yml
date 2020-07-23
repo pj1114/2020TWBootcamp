@@ -1,0 +1,10 @@
+Linebot:
+  access_token: M0tb09mdq8bGe9X5nIEnxU6XaKTVSv/BnMcQ5VndMjrt6SbJXzxcCeu5Ke5hsbGl+Yks70NcLzQKHqKRZJNpO+DdNbjxXidcR21kSgsdf62Is18y16sOYCCwhJGiT8eGk+Ujg0/1+1RPegC4X2kpCAdB04t89/1O/w1cDnyilFU=
+  secret: 6ebc8d1f30c6a9d6de041e8a59a5cff2
+Model:
+  bert_wwm_ext_chinese: hfl/chinese-bert-wwm-ext
+  gpt2_chinese: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/models/gpt2_chinese/prose_wiki_novel_finetuned
+Data:
+  pinyin: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/pinyin.txt
+  stroke: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/stroke.txt
+  dictionary: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/word_dictionary/word_jieba.txt
