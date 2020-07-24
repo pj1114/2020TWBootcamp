@@ -2,6 +2,7 @@ from typing import *
 import torch
 from transformers import BertTokenizer, GPT2LMHeadModel
 from .trie import Trie
+import codecs
 
 class Utils:
 	# Initialize config, device, model, and tokenizer
@@ -65,3 +66,23 @@ class Utils:
 			outputs = self.gpt2_model(token_ids, labels = token_ids)
 			loss = outputs[0]
 			return pow(2, loss.item())
+
+
+	def get_place_dict(self, path: str):
+	    result = []
+        with codecs.open(path1, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                tmp = line.split('\t')
+                result.append(tmp[0])
+	    return result
+	    
+	#person
+	def get_person_dict(self, path: str):
+	    result = []
+	    with codecs.open(path, 'r', encoding='utf-8') as f:
+	        for line in f:
+	            line = line.strip()
+	            tmp = line.split('\t')
+	            result.append(tmp[0])
+	    return result

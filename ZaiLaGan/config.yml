@@ -4,7 +4,11 @@ Linebot:
 Model:
   bert_wwm_ext_chinese: hfl/chinese-bert-wwm-ext
   gpt2_chinese: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/models/gpt2_chinese/prose_wiki_novel_finetuned
+  ner_path: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/utilites/NER/NER_data/data_path
 Data:
   pinyin: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/pinyin.txt
   stroke: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/stroke.txt
   dictionary: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/word_dictionary/word_jieba.txt
+  place: 
+  person: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/place_person/person_s2t.txt 
+  ssc_dir: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/SSC

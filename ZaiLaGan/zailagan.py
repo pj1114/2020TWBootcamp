@@ -3,6 +3,7 @@ import torch
 from transformers import BertTokenizer, BertForMaskedLM
 from zhon import hanzi
 from utilities.utils import Utils
+from utilities.ner import *
 
 class ZaiLaGan():
   # Initialize config, device, model, tokenizer, and utilities
@@ -16,7 +17,15 @@ class ZaiLaGan():
     self.utils = Utils(self.config)
     self.pinyin = self.utils.loadPinYin(self.config["Data"]["pinyin"])
     self.stroke = self.utils.loadStroke(self.config["Data"]["stroke"])
+    self.place = self.utils.get_place_dict(self.config["Data"]["place"])
+    self.person = self.utils.get_person_dict(self.config["Data"]["person"])
+    self.ssc_dir = self.config["Data"]["ssc_dir"]
     self.dict_trie = self.utils.loadDictionaryTrie(self.config["Data"]["dictionary"], True)
+    self.ner_path = self.config["Model"]["ner_path"]
+    self.ner_model = NER_check(self.ner_path, self.pinyin, self.stroke, self.place , self.person, self.ssc_dir)
+
+  def use_ner(self, sentence: List[str]) -> List[List[str, List[int]]:
+    return self.ner_model.check_ner(sentence)
 
   # Detect potential spelling errors in a given sentence/paragraph and return detected error positions
   def detectSpellingError(self, text: str, threshold: float) -> List[int]:

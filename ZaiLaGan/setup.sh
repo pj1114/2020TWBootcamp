@@ -11,3 +11,5 @@ pip install typing --upgrade
 pip install numpy --upgrade
 pip install pandas --upgrade
 pip install pickle --upgrade
+pip install jellyfish --upgrade
+pip install pypinyin --upgrade
