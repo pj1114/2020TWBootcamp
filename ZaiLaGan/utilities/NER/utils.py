@@ -1,6 +1,5 @@
 import logging, sys, argparse
 
-
 def str2bool(v):
     # copy from StackOverflow
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
@@ -10,13 +9,11 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
-
 def get_entity(tag_seq, char_seq):
     PER = get_PER_entity(tag_seq, char_seq)
     LOC = get_LOC_entity(tag_seq, char_seq)
     ORG = get_ORG_entity(tag_seq, char_seq)
     return PER, LOC, ORG
-
 
 def get_PER_entity(tag_seq, char_seq):
     length = len(char_seq)
@@ -40,7 +37,6 @@ def get_PER_entity(tag_seq, char_seq):
             continue
     return PER
 
-
 def get_LOC_entity(tag_seq, char_seq):
     length = len(char_seq)
     LOC = []
@@ -63,7 +59,6 @@ def get_LOC_entity(tag_seq, char_seq):
             continue
     return LOC
 
-
 def get_ORG_entity(tag_seq, char_seq):
     length = len(char_seq)
     ORG = []
@@ -85,14 +80,3 @@ def get_ORG_entity(tag_seq, char_seq):
                 del org
             continue
     return ORG
-
-
-# def get_logger(filename):
-#     logger = logging.getLogger('logger')
-#     logger.setLevel(logging.DEBUG)
-#     logging.basicConfig(format='%(message)s', level=logging.DEBUG)
-#     handler = logging.FileHandler(filename)
-#     handler.setLevel(logging.DEBUG)
-#     handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s: %(message)s'))
-#     logging.getLogger().addHandler(handler)
-#     return logger

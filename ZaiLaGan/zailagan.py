@@ -15,17 +15,16 @@ class ZaiLaGan():
     self.bert_wwm_model = self.bert_wwm_model.to(self.device)
     self.bert_wwm_tokenizer = BertTokenizer.from_pretrained(self.config["Model"]["bert_wwm_ext_chinese"])
     self.utils = Utils(self.config)
+    self.dict_trie = self.utils.loadDictionaryTrie(self.config["Data"]["dictionary"], True)
     self.pinyin = self.utils.loadPinYin(self.config["Data"]["pinyin"])
     self.stroke = self.utils.loadStroke(self.config["Data"]["stroke"])
-    self.place = self.utils.get_place_dict(self.config["Data"]["place"])
-    self.person = self.utils.get_person_dict(self.config["Data"]["person"])
-    self.ssc_dir = self.config["Data"]["ssc_dir"]
-    self.dict_trie = self.utils.loadDictionaryTrie(self.config["Data"]["dictionary"], True)
-    self.ner_path = self.config["Model"]["ner_path"]
-    self.ner_model = NER_check(self.ner_path, self.pinyin, self.stroke, self.place , self.person, self.ssc_dir)
+    self.place = self.utils.loadPlace(self.config["Data"]["place"])
+    self.person = self.utils.loadPerson(self.config["Data"]["person"]) 
+    self.ner_model = NER(self.config["Model"]["ner"], self.pinyin, self.stroke, self.place, self.person, self.config["Data"]["ssc"])
 
-  def use_ner(self, sentence: List[str]) -> List[List[str, List[int]]:
-    return self.ner_model.check_ner(sentence)
+  # Detect named-entities and return their corrections & positions
+  def detectNamedEntity(self, sentences: List[str]):
+    return self.ner_model.check_ner(sentences)
 
   # Detect potential spelling errors in a given sentence/paragraph and return detected error positions
   def detectSpellingError(self, text: str, threshold: float) -> List[int]:

@@ -41,14 +41,19 @@ def handle_message(event):
   # Testing
   try:
     print("handling input: " + event.message.text)
-    recommendations = ZLG.correctSpellingError(event.message.text, ZLG.detectSpellingError(event.message.text,1e-4), [], 5)
-    response = "*****輸入*****\n" + event.message.text + "\n*****輸出*****\n"
-    for i in range(len(recommendations)):
-      if(i != len(recommendations)-1):
-        response += str(i+1) + ". " + recommendations[i] + "\n"
-      else:
-        response += str(i+1) + ". " + recommendations[i]
-    reply(response)
+    ner_processed_text, ne_positions = ZLG.detectNamedEntity([event.message.text])[0]
+    err_positions = ZLG.detectSpellingError(ner_processed_text, 1e-4)
+    if(len(err_positions) >= 3):
+      reply("偵測到的錯字太多了，我們無法幫助您 :(")
+    else:
+      recommendations = ZLG.correctSpellingError(ner_processed_text, err_positions, ne_positions, 5)
+      response = "*****輸入*****\n" + event.message.text + "\n*****輸出*****\n"
+      for i in range(len(recommendations)):
+        if(i != len(recommendations)-1):
+          response += str(i+1) + ". " + recommendations[i] + "\n"
+        else:
+          response += str(i+1) + ". " + recommendations[i]
+      reply(response)
   except:
     print("failed :(")
 

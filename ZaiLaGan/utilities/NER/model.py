@@ -2,21 +2,9 @@ import numpy as np
 import os, time, sys
 import tensorflow as tf
 import tensorflow_addons as tfa
-# from data import pad_sequences, batch_yield
-# from utils import get_logger
-# from eval import conlleval
 import logging
 
 tf.compat.v1.disable_eager_execution()
-# def get_logger(filename):
-#     logger = logging.getLogger('logger')
-#     logger.setLevel(logging.DEBUG)
-#     logging.basicConfig(format='%(message)s', level=logging.DEBUG)
-#     handler = logging.FileHandler(filename)
-#     handler.setLevel(logging.DEBUG)
-#     handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s: %(message)s'))
-#     logging.getLogger().addHandler(handler)
-#     return logger
 
 def sentence2id(sent, word2id):
     """
@@ -52,7 +40,6 @@ def pad_sequences(sequences, pad_mark=0):
         seq_len_list.append(min(len(seq), max_len))
     return seq_list, seq_len_list
 
-
 def batch_yield(data, batch_size, vocab, tag2label, shuffle=False):
     """
 
@@ -80,7 +67,6 @@ def batch_yield(data, batch_size, vocab, tag2label, shuffle=False):
 
     if len(seqs) != 0:
         yield seqs, labels
-
 
 class BiLSTM_CRF(object):
     def __init__(self, args, embeddings, tag2label, vocab, paths):

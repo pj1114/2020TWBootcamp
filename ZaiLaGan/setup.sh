@@ -13,3 +13,5 @@ pip install pandas --upgrade
 pip install pickle --upgrade
 pip install jellyfish --upgrade
 pip install pypinyin --upgrade
+pip install tensorflow==2.2.0
+pip install tensorflow_addons --upgrade

@@ -3,16 +3,15 @@ import numpy as np
 import jellyfish as jf
 import tensorflow as tf
 import argparse, time, random
-from NER.model import BiLSTM_CRF
-from NER.utils import str2bool, get_entity
-from NER.data import read_corpus, read_dictionary, tag2label, random_embedding
-from NER.ssc import *
+from .NER.model import BiLSTM_CRF
+from .NER.utils import str2bool, get_entity
+from .NER.data import read_corpus, read_dictionary, tag2label, random_embedding
+from .NER.ssc import *
 
-class NER_check():
-    def __init__(self, name='our_model', ner_path, pinyin, stroke, place ,person, ssc_dir):
+class NER():
+    def __init__(self, ner_path, pinyin, stroke, place, person, ssc_dir):
         tf.compat.v1.reset_default_graph()
-        self.name = name
-        
+                
         ## Session configuration
         os.environ['CUDA_VISIBLE_DEVICES'] = '0'
         os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # default: 0
@@ -32,7 +31,6 @@ class NER_check():
         parser.add_argument('--update_embedding', type=str2bool, default=True, help='update embedding during training')
         parser.add_argument('--embedding_dim', type=int, default=300, help='random init char embedding_dim')
         args = parser.parse_args(args=[])
-
 
         train_path = os.path.join('.', args.train_data, 'train_data')
         train_data = read_corpus(train_path)
@@ -81,14 +79,13 @@ class NER_check():
         self.sess.close()
         print("NER model closed")
 
-
     def get_NER(self, sentence):
         return self.ner_process_document(sentence)
         
     def harmonic_mean(self, a, b):
         return 2*a*b/(a+b) if a+b!=0 else 0
 
-    def get_closest_match(self, x, list_strings, k=5):
+    def get_closest_match(self, x, list_strings, k = 5):
         best_match = None
         highest_jw = 0
         tmp = []
@@ -147,6 +144,7 @@ class NER_check():
                 if cnt==len(position):
                     flag=1
                     return best, flag
+                    
         return name, flag
       
     def check_name(self, sentence):
@@ -181,8 +179,5 @@ class NER_check():
                     indicies = (j[2],j[3])
                     new_sentence = j[0].join([new_sentence[:indicies[0]], new_sentence[indicies[1]:]])
                     tmp.extend(list(range(j[2],j[3])))
-            all_data.append([new_sentence, tmp])
-        del new_sentence
-        del indicies
+            all_data.append((new_sentence, tmp))
         return all_data
-

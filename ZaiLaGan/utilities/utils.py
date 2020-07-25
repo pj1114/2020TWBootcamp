@@ -19,15 +19,15 @@ class Utils:
 		word_dict = {}
 		with open(path, "r") as dict_file:
 			if(hasFrequency):
-			 	for word in dict_file:
-			 		word = word.split()
-			 		if(word[0] in word_dict):
-			 			word_dict[word[0]] += word[1]
-			 		else:
-			 			word_dict[word[0]] = word[1]
+				for word in dict_file:
+					word = word.split()
+					if(word[0] in word_dict):
+						word_dict[word[0]] += word[1]
+					else:
+						word_dict[word[0]] = word[1]
 			else:
 				for word in dict_file:
-			 		word_dict[word] = -1
+					word_dict[word] = -1
 		return word_dict
 
 	# Load word dictionary and convert it into trie (with word frequency if specified)
@@ -55,6 +55,26 @@ class Utils:
 				pinyin_dict[line[0]] = list(line[1:])
 		return pinyin_dict
 
+	# Load place's named-entity dictionary
+	def loadPlace(self, path: str) -> List[str]:
+		place_lst = []
+		with codecs.open(path, 'r', encoding = 'utf-8') as place_file:
+			for line in place_file:
+				line = line.strip()
+				place = line.split('\t')[0]
+				place_lst.append(place)
+		return place_lst
+
+	# Load person's named-entity dictionary
+	def loadPerson(self, path: str) -> List[str]:
+		person_lst = []
+		with codecs.open(path, 'r', encoding = 'utf-8') as person_file:
+			for line in person_file:
+				line = line.strip()
+				person = line.split('\t')[0]
+				person_lst.append(person)
+		return person_lst
+
 	# Compute the perplexity of a sentence with language model
 	def getSentencePpl(self, sentence: str) -> float:
 		# Tokenize input sentence
@@ -66,23 +86,3 @@ class Utils:
 			outputs = self.gpt2_model(token_ids, labels = token_ids)
 			loss = outputs[0]
 			return pow(2, loss.item())
-
-
-	def get_place_dict(self, path: str):
-	    result = []
-        with codecs.open(path1, 'r', encoding='utf-8') as f:
-            for line in f:
-                line = line.strip()
-                tmp = line.split('\t')
-                result.append(tmp[0])
-	    return result
-	    
-	#person
-	def get_person_dict(self, path: str):
-	    result = []
-	    with codecs.open(path, 'r', encoding='utf-8') as f:
-	        for line in f:
-	            line = line.strip()
-	            tmp = line.split('\t')
-	            result.append(tmp[0])
-	    return result

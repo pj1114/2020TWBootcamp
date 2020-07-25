@@ -8,7 +8,6 @@ tag2label = {"O": 0,
              "B-ORG": 5, "I-ORG": 6
              }
 
-
 def read_corpus(corpus_path):
     """
     read corpus and return the list of samples
@@ -29,7 +28,6 @@ def read_corpus(corpus_path):
             sent_, tag_ = [], []
 
     return data
-
 
 def vocab_build(vocab_path, corpus_path, min_count):
     """
@@ -69,26 +67,6 @@ def vocab_build(vocab_path, corpus_path, min_count):
     with open(vocab_path, 'wb') as fw:
         pickle.dump(word2id, fw)
 
-
-# def sentence2id(sent, word2id):
-#     """
-
-#     :param sent:
-#     :param word2id:
-#     :return:
-#     """
-#     sentence_id = []
-#     for word in sent:
-#         if word.isdigit():
-#             word = '<NUM>'
-#         elif ('\u0041' <= word <= '\u005a') or ('\u0061' <= word <= '\u007a'):
-#             word = '<ENG>'
-#         if word not in word2id:
-#             word = '<UNK>'
-#         sentence_id.append(word2id[word])
-#     return sentence_id
-
-
 def read_dictionary(vocab_path):
     """
 
@@ -100,7 +78,6 @@ def read_dictionary(vocab_path):
         word2id = pickle.load(fr)
     print('vocab_size:', len(word2id))
     return word2id
-
 
 def random_embedding(vocab, embedding_dim):
     """

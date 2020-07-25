@@ -5,7 +5,7 @@ import pickle
 
 class FourCornerMethod(object):
     def __init__(self, path):
-        data_file = pkg_resources.resource_filename(__name__, path+"/data.pkl")
+        data_file = path + "/data.pkl"
         with open(data_file, 'rb') as f:
             self.data = pickle.load(f)
     
@@ -53,7 +53,7 @@ class ssc():
 
 	def getHanziStrokesDict(self,path):
 	    hanziStrokesDict = {}#汉子：笔画数
-	    strokes_filepath = pkg_resources.resource_filename(__name__, path+"/utf8_strokes.txt")
+	    strokes_filepath = path + "/utf8_strokes.txt"
 	    with open(strokes_filepath, 'r', encoding='UTF-8') as f:#文件特征：
 	        for line in f:
 	            line = line.split()
@@ -62,7 +62,7 @@ class ssc():
 
 	def getHanziStructureDict(self,path):
 	    hanziStructureDict = {}#汉子：形体结构
-	    structure_filepath = pkg_resources.resource_filename(__name__, path+"/unihan_structure.txt")
+	    structure_filepath = path + "/unihan_structure.txt"
 	    with open(structure_filepath, 'r', encoding='UTF-8') as f:#文件特征：U+4EFF\t仿\t⿰亻方\n
 	        for line in f:
 	            line = line.split()
@@ -72,7 +72,7 @@ class ssc():
 
 	def getHanziSSCDict(self,path):
 	    hanziSSCDict = {}#汉子：SSC码   
-	    hanzi_ssc_filepath = pkg_resources.resource_filename(__name__, path+"/hanzi_ssc_res.txt")
+	    hanzi_ssc_filepath = path + "/hanzi_ssc_res.txt"
 	    with open(hanzi_ssc_filepath, 'r', encoding='UTF-8') as f:#文件特征：U+4EFF\t仿\t音形码\n
 	        for line in f:
 	            line = line.split()
@@ -127,7 +127,6 @@ class ssc():
 	        res.append(self.strokesDict[int(strokes)])     
 	    return res       
 
-
 	def getSSC(self, hanzi_sentence):
 	    hanzi_sentence_ssc_list = []
 	    for one_chi_word in hanzi_sentence:
@@ -145,7 +144,7 @@ class ssc():
 	        hanzi_sentence_ssc_list.append(ssc)
 	    return hanzi_sentence_ssc_list
 
-	def computeSoundCodeSimilarity(self, soundCode1, soundCode2):#soundCode=['2', '8', '5', '2']
+	def computeSoundCodeSimilarity(self, soundCode1, soundCode2):
 	    featureSize=len(soundCode1)
 	    wights=[0.4,0.4,0.1,0.1]
 	    multiplier=[]
@@ -159,7 +158,7 @@ class ssc():
 	        soundSimilarity += wights[i]*multiplier[i]
 	    return soundSimilarity
 	    
-	def computeShapeCodeSimilarity(self, shapeCode1, shapeCode2):#shapeCode=['5', '6', '0', '1', '0', '3', '8']
+	def computeShapeCodeSimilarity(self, shapeCode1, shapeCode2):
 	    featureSize=len(shapeCode1)
 	    wights=[0.25,0.1,0.1,0.1,0.1,0.1,0.25]
 	    multiplier=[]
