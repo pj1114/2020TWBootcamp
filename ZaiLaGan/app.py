@@ -38,13 +38,23 @@ def handle_message(event):
   # Reply message to user
   def reply(text):
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = text))
-  # Testing
+  # Correct input sentence's spelling errors
   try:
     print("handling input: " + event.message.text)
+    # Perform named-entity recognition first
     ner_processed_text, ne_positions = ZLG.detectNamedEntity([event.message.text])[0]
-    err_positions = ZLG.detectSpellingError(ner_processed_text, 1e-4)
-    if(len(err_positions) >= 3):
-      reply("偵測到的錯字太多了，我們無法幫助您 :(")
+    ne_positions = set(ne_positions)
+    # Detect spelling errors
+    err_positions = set(ZLG.detectSpellingError(ner_processed_text, 1e-4))
+    # Count the number of errors that are not included in any named-entity
+    non_ne_err_count = 0
+    for err_position in err_positions:
+      if(err_position not in ne_positions):
+        non_ne_err_count += 1
+    # Too many detected errors
+    if(non_ne_err_count >= 3):
+      reply("系統偵測到的錯字過多，很抱歉我們無法幫助您 :(")
+    # Correct spelling errors
     else:
       recommendations = ZLG.correctSpellingError(ner_processed_text, err_positions, ne_positions, 5)
       response = "*****輸入*****\n" + event.message.text + "\n*****輸出*****\n"

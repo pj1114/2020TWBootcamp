@@ -55,32 +55,29 @@ class ZaiLaGan():
     return positions
 
   # Give top n suggestions of spelling error correction
-  def correctSpellingError(self, text: str, err_positions: List[int], ne_positions: List[int], candidate_num: int) -> List[str]:
-    # Convert error positions and named-entity positions into sets
-    err_positions = set(err_positions)
-    ne_positions = set(ne_positions)
+  def correctSpellingError(self, text: str, err_positions: Set[int], ne_positions: Set[int], candidate_num: int) -> List[str]:
     # Initialize a dictionary to record starting positions of potentially correct tokens/words
     starting_positions = {}
     # Add original tokens
     for i in range(len(text)):
       token = text[i]
-      starting_positions[i] = [token]
+      starting_positions[i] = set(token)
     # Add similar tokens in stroke or pinyin
     for error_position in err_positions:
-      error_token = text[error_position]
       # Check if the error token is included in a named-entity
       if(error_position in ne_positions):
         continue
       else:
+        error_token = text[error_position]
         if(error_token in self.stroke):
-          for similar_token in self.stroke[error_token]:
-            starting_positions[error_position].append(similar_token)
+          for similar_token in self.stroke[error_token][:10]:
+            starting_positions[error_position].add(similar_token)
         if(error_token in self.pinyin):
-          for similar_token in self.pinyin[error_token]:
-            starting_positions[error_position].append(similar_token)
+          for similar_token in self.pinyin[error_token][:10]:
+            starting_positions[error_position].add(similar_token)
     # Construct candidate sentences
     candidates = []
-    prefixes = starting_positions[0].copy()
+    prefixes = list(starting_positions[0])
     while(len(prefixes) > 0):
       prefix = prefixes.pop(0)
       if(len(prefix) == len(text)):
