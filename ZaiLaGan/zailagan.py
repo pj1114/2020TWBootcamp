@@ -26,9 +26,10 @@ class ZaiLaGan():
   def detectNamedEntity(self, sentences: List[str]):
     return self.ner_model.check_ner(sentences)
 
-  # Detect potential spelling errors in a given sentence/paragraph and return detected error positions
-  def detectSpellingError(self, text: str, threshold: float) -> List[int]:
+  # Detect potential spelling errors in a given sentence/paragraph and return detected error positions & top predictions from BERT
+  def detectSpellingError(self, text: str, threshold: float):
     positions = []
+    predictions = {}
     # Mask each word and predict it
     for i in range(len(text)):
       # Check if current word is a punctuation
@@ -48,14 +49,18 @@ class ZaiLaGan():
       with torch.no_grad():
         outputs = self.bert_wwm_model(token_ids, token_type_ids = segment_ids)
         scores = outputs[0][0,i+1]
-        token_probability = torch.nn.Softmax(0)(scores)[self.bert_wwm_tokenizer.convert_tokens_to_ids(text[i])]
         # Classify the token as a potential spelling error if predicted probability is lower than given threshold
+        token_probability = torch.nn.Softmax(0)(scores)[self.bert_wwm_tokenizer.convert_tokens_to_ids(text[i])]
         if(token_probability < threshold):
+          # Extract top predictions from BERT
+          token_scores, token_indices = scores.topk(5)
+          top_predicted_tokens = self.bert_wwm_tokenizer.convert_ids_to_tokens(token_indices)
           positions.append(i)
-    return positions
+          predictions[i] = top_predicted_tokens
+    return (positions, predictions)
 
   # Give top n suggestions of spelling error correction
-  def correctSpellingError(self, text: str, err_positions: Set[int], ne_positions: Set[int], candidate_num: int) -> List[str]:
+  def correctSpellingError(self, text: str, err_positions: Set[int], predictions, ne_positions: Set[int], candidate_num: int) -> List[str]:
     # Initialize a dictionary to record starting positions of potentially correct tokens/words
     starting_positions = {}
     # Add original tokens
@@ -63,18 +68,20 @@ class ZaiLaGan():
       token = text[i]
       starting_positions[i] = set(token)
     # Add similar tokens in stroke or pinyin
-    for error_position in err_positions:
+    for err_position in err_positions:
       # Check if the error token is included in a named-entity
-      if(error_position in ne_positions):
+      if(err_position in ne_positions):
         continue
       else:
-        error_token = text[error_position]
+        error_token = text[err_position]
         if(error_token in self.stroke):
           for similar_token in self.stroke[error_token][:10]:
-            starting_positions[error_position].add(similar_token)
+            starting_positions[err_position].add(similar_token)
         if(error_token in self.pinyin):
           for similar_token in self.pinyin[error_token][:10]:
-            starting_positions[error_position].add(similar_token)
+            starting_positions[err_position].add(similar_token)
+        for predicted_token in predictions[err_position]:
+          starting_positions[err_position].add(predicted_token)
     # Construct candidate sentences
     candidates = []
     prefixes = list(starting_positions[0])
