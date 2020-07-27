@@ -104,6 +104,7 @@ class NER():
 
     def find_similar(self, name, name_dict):
         best_score_name = self.get_closest_match(name, name_dict, 10)
+        flag = 0
         for best, score in best_score_name:
             flag=0
             if best:

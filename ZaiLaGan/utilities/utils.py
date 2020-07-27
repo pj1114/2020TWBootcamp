@@ -3,6 +3,7 @@ import torch
 from transformers import BertTokenizer, GPT2LMHeadModel
 from .trie import Trie
 import codecs
+import pickle
 
 class Utils:
 	# Initialize config, device, model, and tokenizer
@@ -48,11 +49,8 @@ class Utils:
 
 	# Load token-level similar pinyin dictionary
 	def loadPinYin(self, path: str) -> Dict[str,List[str]]:
-		pinyin_dict = {}
-		with open(path, "r") as pinyin_file:
-			for line in pinyin_file:
-				line = line.replace(" ", "").replace("\t", "").replace("\n", "")
-				pinyin_dict[line[0]] = list(line[1:])
+		with open(path, "rb") as pinyin_file:
+			pinyin_dict = pickle.load(pinyin_file)
 		return pinyin_dict
 
 	# Load place's named-entity dictionary

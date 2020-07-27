@@ -6,7 +6,7 @@ Model:
   gpt2_chinese: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/models/gpt2_chinese/prose_wiki_novel_finetuned
   ner: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/utilities/NER/NER_data/data_path
 Data:
-  pinyin: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/pinyin.txt
+  pinyin: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/pinyin.pkl
   stroke: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/stroke.txt
   dictionary: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/word_dictionary/word_jieba.txt
   place: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/ner/place.txt
