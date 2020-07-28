@@ -8,7 +8,7 @@ Model:
   bert_base_chinese: bert-base-chinese
 Data:
   pinyin: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/pinyin.pkl
-  stroke: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/stroke.txt
+  stroke: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/stroke.pkl
   common_char_set: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/common_char_set_t.txt
   custom_confusion: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/confusion.txt
   dictionary: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/word_dictionary/word_jieba.txt

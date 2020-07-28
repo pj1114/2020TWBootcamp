@@ -41,11 +41,8 @@ class Utils:
 
 	# Load token-level similar stroke dictionary
 	def loadStroke(self, path: str) -> Dict[str,List[str]]:
-		stroke_dict = {}
-		with open(path, "r") as stroke_file:
-			for line in stroke_file:
-				line = line.replace(" ", "").replace("\t", "").replace("\n", "")
-				stroke_dict[line[0]] = list(line[1:])
+		with open(path, "rb") as stroke_file:
+			stroke_dict = pickle.load(stroke_file)
 		return stroke_dict
 
 	# Load token-level similar pinyin dictionary
