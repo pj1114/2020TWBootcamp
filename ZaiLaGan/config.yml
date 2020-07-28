@@ -5,9 +5,12 @@ Model:
   bert_wwm_ext_chinese: hfl/chinese-bert-wwm-ext
   gpt2_chinese: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/models/gpt2_chinese/prose_wiki_novel_finetuned
   ner: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/utilities/NER/NER_data/data_path
+  bert_base_chinese: bert-base-chinese
 Data:
   pinyin: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/pinyin.pkl
   stroke: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/stroke.txt
+  common_char_set: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/common_char_set_t.txt
+  custom_confusion: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/confusion.txt
   dictionary: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/word_dictionary/word_jieba.txt
   place: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/ner/place.txt
   person: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/ner/person.txt 
