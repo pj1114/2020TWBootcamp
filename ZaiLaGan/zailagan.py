@@ -38,6 +38,7 @@ class ZaiLaGan():
       masked_text = "[CLS]" + text[:i] + "[MASK]" + text[i+1:] + "[SEP]"
       # Tokenize input text
       tokenized_masked_text = self.bert_wwm_tokenizer.tokenize(masked_text)
+      masked_token_index = tokenized_masked_text.index("[MASK]")
       # Construct token ids and segment ids
       token_ids = torch.tensor([self.bert_wwm_tokenizer.convert_tokens_to_ids(tokenized_masked_text)])
       segment_ids = torch.tensor([[0] * token_ids.shape[1]])
@@ -47,7 +48,7 @@ class ZaiLaGan():
       # Predict masked token
       with torch.no_grad():
         outputs = self.bert_wwm_model(token_ids, token_type_ids = segment_ids)
-        scores = outputs[0][0,i+1]
+        scores = outputs[0][0,masked_token_index]
         # Classify the token as a potential spelling error if predicted probability is lower than given threshold
         token_probability = torch.nn.Softmax(0)(scores)[self.bert_wwm_tokenizer.convert_tokens_to_ids(text[i])]
         if(token_probability < threshold):
