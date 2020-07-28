@@ -15,12 +15,10 @@ class ZaiLaGan():
     self.bert_wwm_model.eval()
     self.bert_wwm_model = self.bert_wwm_model.to(self.device)
     self.bert_wwm_tokenizer = BertTokenizer.from_pretrained(self.config["Model"]["bert_wwm_ext_chinese"])
-
     self.bert_base_model = BertForMaskedLM.from_pretrained(self.config["Model"]["bert_base_chinese"])
     self.bert_base_model.eval()
     self.bert_base_model = self.bert_base_model.to(self.device)
     self.bert_base_tokenizer = BertTokenizer.from_pretrained(self.config["Model"]["bert_base_chinese"])
-
     self.utils = Utils(self.config)
     self.dict_trie = self.utils.loadDictionaryTrie(self.config["Data"]["dictionary"], True)
     self.pinyin = self.utils.loadPinYin(self.config["Data"]["pinyin"])
@@ -133,8 +131,7 @@ class ZaiLaGan():
       for edit in edit_set: 
         if self.dict_trie.getWordFreq(edit) > 0:
           edit_cand.add(edit)
-      correction_candidates.extend(edit_cand)
-      
+      correction_candidates.extend(edit_cand)   
       
       confusion_word_set = set()
       if word in self.customConfusionDict:
@@ -145,7 +142,6 @@ class ZaiLaGan():
         # Add similar tokens in pinyin
         correction_candidates.extend(set(ele + word[1:] for ele in self.pinyin[word[0]] if ele))
         correction_candidates.extend(set(word[:-1]+ele for ele in self.pinyin[word[-1]] if ele))
-
 
       if len(word) > 2:
         correction_candidates.extend(set(word[0] + ele + word[2:] for ele in self.pinyin[word[1]] if ele))
