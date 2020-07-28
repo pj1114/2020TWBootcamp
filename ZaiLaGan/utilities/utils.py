@@ -37,6 +37,7 @@ class Utils:
 		dictionary = self.loadDictionary(path, hasFrequency)
 		for word, frequency in dictionary.items():
 			trie.addWord(word, frequency)
+		return trie
 
 	# Load token-level similar stroke dictionary
 	def loadStroke(self, path: str) -> Dict[str,List[str]]:
@@ -52,6 +53,23 @@ class Utils:
 		with open(path, "rb") as pinyin_file:
 			pinyin_dict = pickle.load(pinyin_file)
 		return pinyin_dict
+
+	# Load common character set
+	def loadCharSet(self, path: str) -> set:
+		chars_set = set()
+		with open(path, 'r', encoding='utf-8') as char_set_file:
+			for char in char_set_file:
+				chars_set.add(char.replace('\n', ''))
+		return chars_set
+
+	# Load custom confusion dict
+	def loadCustomConfusion(self, path: str) -> Dict[str,str]:
+		custom_confusion_dict = dict()
+		with open(path, "r") as file:
+			for line in file:
+				line = line.replace('\n', '').split('\t')
+				custom_confusion_dict[line[0]] = line[1]
+		return custom_confusion_dict
 
 	# Load place's named-entity dictionary
 	def loadPlace(self, path: str) -> List[str]:

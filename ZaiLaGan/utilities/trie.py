@@ -39,3 +39,12 @@ class Trie():
 			if(i == len(word)-1):
 				currentNode.setIsWord()
 				currentNode.setWordFrequency(frequency)
+
+	# Get word frequency
+	def getWordFreq(self, word: str) -> int:
+		node = self.root
+		for token in word:
+			if token not in node.children:
+				return -1
+			node = node.children[token]
+		return int(node.frequency)
