@@ -37,6 +37,7 @@ class Utils:
 		dictionary = self.loadDictionary(path, hasFrequency)
 		for word, frequency in dictionary.items():
 			trie.addWord(word, frequency)
+		return trie
 
 	# Load token-level similar stroke dictionary
 	def loadStroke(self, path: str) -> Dict[str,List[str]]:

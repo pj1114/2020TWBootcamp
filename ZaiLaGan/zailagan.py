@@ -22,11 +22,11 @@ class ZaiLaGan():
     self.ner_model = NER(self.config["Model"]["ner"], self.pinyin, self.stroke, self.place, self.person, self.config["Data"]["ssc"])
 
   # Detect named-entities and return their corrections & positions
-  def detectNamedEntity(self, sentences: List[str]):
+  def detectNamedEntity(self, sentences: List[str]) -> List[Tuple[str,List[int]]]:
     return self.ner_model.check_ner(sentences)
 
   # Detect potential spelling errors in a given sentence/paragraph and return detected error positions & top predictions from BERT
-  def detectSpellingError(self, text: str, threshold: float):
+  def detectSpellingError(self, text: str, threshold: float) -> Tuple[List[int],Dict[int,List[str]]]:
     positions = []
     predictions = {}
     # Mask each word and predict it
@@ -59,7 +59,7 @@ class ZaiLaGan():
     return (positions, predictions)
 
   # Give top n suggestions of spelling error correction
-  def correctSpellingError(self, text: str, err_positions: Set[int], predictions, ne_positions: Set[int], candidate_num: int) -> List[str]:
+  def correctSpellingError(self, text: str, err_positions: Set[int], predictions: Dict[int,List[str]], ne_positions: Set[int], candidate_num: int) -> List[str]:
     # Initialize a dictionary to record starting positions of potentially correct tokens/words
     starting_positions = {}
     # Add original tokens

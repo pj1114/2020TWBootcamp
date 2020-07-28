@@ -45,7 +45,7 @@ def handle_message(event):
     ner_processed_text, ne_positions = ZLG.detectNamedEntity([event.message.text])[0]
     ne_positions = set(ne_positions)
     # Detect spelling errors
-    err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 5e-3)
+    err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 8e-3)
     err_positions = set(err_positions)
     # Count the number of errors that are not included in any named-entity
     non_ne_err_count = 0
