@@ -2,6 +2,7 @@ import os
 import numpy as np
 import jellyfish as jf
 import tensorflow as tf
+import re
 import argparse, time, random
 from .NER.model import BiLSTM_CRF
 from .NER.utils import str2bool, get_entity
@@ -61,18 +62,30 @@ class NER():
     def ner_process_document(self, article):
         #函數用來呼叫NER，讓NER能被多次使用
         data = list()
-        
         for sentence in article:
             demo_sent = sentence.strip()
             demo_data = [(demo_sent, ['O'] * len(demo_sent))]
             tag = self.recognizer.demo_one(self.sess, demo_data)
             PER, LOC, ORG = get_entity(tag, demo_sent)
-            per = [(i, 'NR', sentence.find(i), sentence.find(i)+len(i)) for i in PER]
-            loc = [(i, 'NT', sentence.find(i), sentence.find(i)+len(i)) for i in LOC]
-            org = [(i, 'NS', sentence.find(i), sentence.find(i)+len(i)) for i in ORG]
+            per = [(i, 'NR', j.start(), j.end()) for i in set(PER)  for j in re.finditer(i, sentence)]
+            loc = [(i, 'NT', j.start(), j.end()) for i in set(LOC) for j in re.finditer(i, sentence)]
+            org = [(i, 'NS', j.start(), j.end()) for i in set(ORG) for j in re.finditer(i, sentence)]
             per+=loc
             per+=org
-            data.append(per)
+            per = sorted(per, key=lambda x:x[2])
+            tmp_keep = []
+            left = per[0][2]
+            right = per[0][3]
+            for idx in per:
+                if left==idx[2] and right==idx[3]:
+                    tmp_keep.append(idx)
+                elif left<=idx[2] and right>=idx[3]:
+                    continue
+                else:
+                    tmp_keep.append(idx)
+                    left = idx[2]
+                    right = idx[3]
+            data.append(tmp_keep)
         return data
 
     def throw_NER(self):
@@ -89,16 +102,19 @@ class NER():
         best_match = None
         highest_jw = 0
         tmp = []
-        for current_string in list_strings:
-            jwscore = jf.jaro_winkler(x, current_string)
-            if jwscore < 0.4:
-                continue
-            else:
-                current_score = self.harmonic_mean(jwscore, self.ssc.compute_similarity(x, current_string))
-            if(current_score > highest_jw):
-                highest_jw = current_score
-                best_match = current_string
-                tmp.append((best_match, highest_jw))
+        if x not in list_strings:
+            for current_string in list_strings:
+                jwscore = jf.jaro_winkler(x, current_string)
+                if jwscore < 0.4:
+                    continue
+                else:
+                    current_score = self.harmonic_mean(jwscore, self.ssc.compute_similarity(x, current_string))
+                if(current_score > highest_jw):
+                    highest_jw = current_score
+                    best_match = current_string
+                    tmp.append((best_match, highest_jw))
+        else:
+            tmp.append((x,1))
         tmp = sorted(tmp, key=lambda tup: tup[1], reverse=True)
         return tmp[:k]
 
@@ -173,12 +189,20 @@ class NER():
         for idx, i in enumerate(all_truth):
             tmp = []
             new_sentence = sentence[idx]
+            cumlen = 0
             for j in i:
                 if j[2]+1==j[3]:
                     continue
                 else:
-                    indicies = (j[2],j[3])
+                    indicies = (j[2]+cumlen,j[3]+cumlen)
                     new_sentence = j[0].join([new_sentence[:indicies[0]], new_sentence[indicies[1]:]])
-                    tmp.extend(list(range(j[2],j[3])))
+                    if len(j[0])>j[3]-j[2]:
+                        new_len = len(j[0])-(j[3]-j[2])
+                        tmp.extend(list(range(j[2]_cumlen, j[3]+cumlen+new_len)))
+                        cumlen+=new_len
+                    else:
+                        tmp.extend(list(range(j[2]+cumlen, j[3]+cumlen)))
             all_data.append((new_sentence, tmp))
         return all_data
+
+

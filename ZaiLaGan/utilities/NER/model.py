@@ -71,24 +71,16 @@ def batch_yield(data, batch_size, vocab, tag2label, shuffle=False):
 class BiLSTM_CRF(object):
     def __init__(self, args, embeddings, tag2label, vocab, paths):
         self.batch_size = args.batch_size
-        # self.epoch_num = args.epoch
         self.hidden_dim = args.hidden_dim
         self.embeddings = embeddings
         self.CRF = args.CRF
         self.update_embedding = args.update_embedding
-        # self.dropout_keep_prob = args.dropout
         self.optimizer = args.optimizer
-        # self.lr = args.lr
         self.clip_grad = args.clip
         self.tag2label = tag2label
         self.num_tags = len(tag2label)
         self.vocab = vocab
-        # self.shuffle = args.shuffle
         self.model_path = paths['model_path']
-        # self.summary_path = paths['summary_path']
-        # self.logger = get_logger(paths['log_path'])
-        # self.result_path = paths['result_path']
-        # self.config = config
 
     def build_graph(self):
         self.add_placeholders()
@@ -194,39 +186,6 @@ class BiLSTM_CRF(object):
     def init_op(self):
         self.init_op = tf.compat.v1.global_variables_initializer()
 
-    # def add_summary(self, sess):
-    #     """
-
-    #     :param sess:
-    #     :return:
-    #     """
-    #     self.merged = tf.compat.v1.summary.merge_all()
-    #     self.file_writer = tf.compat.v1.summary.FileWriter(self.summary_path, sess.graph)
-
-    # def train(self, train, dev):
-    #     """
-
-    #     :param train:
-    #     :param dev:
-    #     :return:
-    #     """
-    #     saver = tf.compat.v1.train.Saver(tf.compat.v1.global_variables())
-
-    #     with tf.compat.v1.Session(config=self.config) as sess:
-    #         sess.run(self.init_op)
-    #         self.add_summary(sess)
-
-    #         for epoch in range(self.epoch_num):
-    #             self.run_one_epoch(sess, train, dev, self.tag2label, epoch, saver)
-
-    # def test(self, test):
-    #     saver = tf.compat.v1.train.Saver()
-    #     with tf.compat.v1.Session(config=self.config) as sess:
-    #         self.logger.info('=========== testing ===========')
-    #         saver.restore(sess, self.model_path)
-    #         label_list, seq_len_list = self.dev_one_epoch(sess, test)
-    #         self.evaluate(label_list, seq_len_list, test)
-
     def demo_one(self, sess, sent):
         """
 
@@ -243,42 +202,6 @@ class BiLSTM_CRF(object):
             label2tag[label] = tag if label != 0 else label
         tag = [label2tag[label] for label in label_list[0]]
         return tag
-
-    # def run_one_epoch(self, sess, train, dev, tag2label, epoch, saver):
-    #     """
-
-    #     :param sess:
-    #     :param train:
-    #     :param dev:
-    #     :param tag2label:
-    #     :param epoch:
-    #     :param saver:
-    #     :return:
-    #     """
-    #     num_batches = (len(train) + self.batch_size - 1) // self.batch_size
-
-    #     start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    #     batches = batch_yield(train, self.batch_size, self.vocab, self.tag2label, shuffle=self.shuffle)
-    #     for step, (seqs, labels) in enumerate(batches):
-
-    #         sys.stdout.write(' processing: {} batch / {} batches.'.format(step + 1, num_batches) + '\r')
-    #         step_num = epoch * num_batches + step + 1
-    #         feed_dict, _ = self.get_feed_dict(seqs, labels, self.lr, self.dropout_keep_prob)
-    #         _, loss_train, summary, step_num_ = sess.run([self.train_op, self.loss, self.merged, self.global_step],
-    #                                                      feed_dict=feed_dict)
-    #         if step + 1 == 1 or (step + 1) % 300 == 0 or step + 1 == num_batches:
-    #             self.logger.info(
-    #                 '{} epoch {}, step {}, loss: {:.4}, global_step: {}'.format(start_time, epoch + 1, step + 1,
-    #                                                                             loss_train, step_num))
-
-    #         self.file_writer.add_summary(summary, step_num)
-
-    #         if step + 1 == num_batches:
-    #             saver.save(sess, self.model_path, global_step=step_num)
-
-    #     self.logger.info('===========validation / test===========')
-    #     label_list_dev, seq_len_list_dev = self.dev_one_epoch(sess, dev)
-    #     self.evaluate(label_list_dev, seq_len_list_dev, dev, epoch)
 
     def get_feed_dict(self, seqs, labels=None, lr=None, dropout=None):
         """
@@ -302,20 +225,6 @@ class BiLSTM_CRF(object):
             feed_dict[self.dropout_pl] = dropout
 
         return feed_dict, seq_len_list
-
-    # def dev_one_epoch(self, sess, dev):
-    #     """
-
-    #     :param sess:
-    #     :param dev:
-    #     :return:
-    #     """
-    #     label_list, seq_len_list = [], []
-    #     for seqs, labels in batch_yield(dev, self.batch_size, self.vocab, self.tag2label, shuffle=False):
-    #         label_list_, seq_len_list_ = self.predict_one_batch(sess, seqs)
-    #         label_list.extend(label_list_)
-    #         seq_len_list.extend(seq_len_list_)
-    #     return label_list, seq_len_list
 
     def predict_one_batch(self, sess, seqs):
         """
