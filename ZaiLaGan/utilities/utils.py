@@ -84,3 +84,10 @@ class Utils:
 			outputs = self.gpt2_model(token_ids, labels = token_ids)
 			loss = outputs[0]
 			return pow(2, loss.item())
+
+	# Check if a character is a chinese character
+	def isChineseChar(self, character: str) -> bool:
+		if('\u4e00' <= character <= '\u9fff'):
+			return True
+		else:
+			return False

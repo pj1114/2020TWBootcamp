@@ -1,7 +1,6 @@
 from typing import *
 import torch
 from transformers import BertTokenizer, BertForMaskedLM
-from zhon import hanzi
 from utilities.utils import Utils
 from utilities.ner import *
 
@@ -32,8 +31,8 @@ class ZaiLaGan():
     predictions = {}
     # Mask each word and predict it
     for i in range(len(text)):
-      # Check if current word is a punctuation
-      if(text[i] in hanzi.punctuation):
+      # Check if current word is a chinese character
+      if(not self.utils.isChineseChar(text[i])):
         continue
       # Add mask
       masked_text = "[CLS]" + text[:i] + "[MASK]" + text[i+1:] + "[SEP]"
@@ -81,7 +80,9 @@ class ZaiLaGan():
           for similar_token in self.pinyin[error_token][:10]:
             starting_positions[err_position].add(similar_token)
         for predicted_token in predictions[err_position]:
-          starting_positions[err_position].add(predicted_token)
+          # Check if BERT's prediction is a chinese character
+          if(len(predicted_token) == 1 and self.utils.isChineseChar(predicted_token)):
+            starting_positions[err_position].add(predicted_token)
     # Construct candidate sentences
     candidates = []
     prefixes = list(starting_positions[0])
