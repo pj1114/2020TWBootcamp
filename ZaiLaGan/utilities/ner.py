@@ -211,7 +211,7 @@ class NER():
         return all_truth
     
     def check_ner(self, sentence):
-        sentence = [re.sub(r'[^\u4e00-\ufaffa-zA-Z0-9]', '',i) for i in sentence]
+        sentence = [re.sub(r'[\x00-\x20\x7E-\xFF\u3000\xa0\t]', '',i) for i in sentence]
         all_truth = self.check_name(sentence)
         all_data = []
         for idx, i in enumerate(all_truth):
