@@ -17,13 +17,14 @@ with open("./config.yml", "r") as config_file_yaml:
 line_bot_api = LineBotApi(config["Linebot"]["access_token"])
 handler = WebhookHandler(config["Linebot"]["secret"]) 
 
-# Add root path to all paths in configure
-model_path_list = ['gpt2_chinese','ner']
-dict_path_list = ['pinyin','stroke','common_char_set','custom_confusion','dictionary','place','person','ssc']
-for i in model_path_list:
-    config["Model"][i] = os.path.join(config["User"]["User_path"], config["Model"][i])
-for i in dict_path_list:
-    config["Data"][i] = os.path.join(config["User"]["User_path"], config["Data"][i])
+# Concatenate root path with all subpaths
+root_path = config["User"]["user_path"]
+model_names = ["gpt2_chinese", "ner"]
+data_names = ["pinyin", "stroke", "dictionary", "common_char_set", "confusion", "place", "person", "ssc"]
+for model_name in model_names:
+    config["Model"][model_name] = os.path.join(root_path, config["Model"][model_name])
+for data_name in data_names:
+    config["Data"][data_name] = os.path.join(root_path, config["Data"][data_name])
 
 # Instantiate ZaiLaGan
 ZLG = ZaiLaGan(config)
@@ -54,7 +55,7 @@ def handle_message(event):
     ner_processed_text, ne_positions = ZLG.detectNamedEntity([event.message.text])[0]
     ne_positions = set(ne_positions)
     # Detect spelling errors
-    err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 5e-3)
+    err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 8e-3)
     err_positions = set(err_positions)
     # Count the number of errors that are not included in any named-entity
     non_ne_err_count = 0
@@ -62,7 +63,7 @@ def handle_message(event):
       if(err_position not in ne_positions):
         non_ne_err_count += 1
     # Too many detected errors
-    if(non_ne_err_count >= 3):
+    if(non_ne_err_count >= 4):
       reply("系統偵測到的錯字過多，很抱歉我們無法幫助您 :(")
     # Correct spelling errors
     else:

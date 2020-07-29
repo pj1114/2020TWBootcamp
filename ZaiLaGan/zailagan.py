@@ -27,7 +27,7 @@ class ZaiLaGan():
     self.person = self.utils.loadPerson(self.config["Data"]["person"]) 
     self.ner_model = NER(self.config["Model"]["ner"], self.pinyin, self.stroke, self.place, self.person, self.config["Data"]["ssc"])
     self.charSet = self.utils.loadCharSet(self.config['Data']['common_char_set'])
-    self.customConfusionDict = self.utils.loadCustomConfusion(self.config['Data']['custom_confusion'])
+    self.customConfusionDict = self.utils.loadCustomConfusion(self.config['Data']['confusion'])
 
   # Detect named-entities and return their corrections & positions
   def detectNamedEntity(self, sentences: List[str]) -> List[Tuple[str,List[int]]]:
@@ -61,7 +61,7 @@ class ZaiLaGan():
         token_probability = torch.nn.Softmax(0)(scores)[self.bert_wwm_tokenizer.convert_tokens_to_ids(text[i])]
         if(token_probability < threshold):
           # Extract top predictions from BERT
-          token_scores, token_indices = scores.topk(5)
+          token_scores, token_indices = scores.topk(2)
           top_predicted_tokens = self.bert_wwm_tokenizer.convert_ids_to_tokens(token_indices)
           positions.append(i)
           predictions[i] = top_predicted_tokens
@@ -83,10 +83,10 @@ class ZaiLaGan():
       else:
         error_token = text[err_position]
         if(error_token in self.stroke):
-          for similar_token in self.stroke[error_token][:10]:
+          for similar_token in self.stroke[error_token][:2]:
             starting_positions[err_position].add(similar_token)
         if(error_token in self.pinyin):
-          for similar_token in self.pinyin[error_token][:10]:
+          for similar_token in self.pinyin[error_token][:2]:
             starting_positions[err_position].add(similar_token)
         for predicted_token in predictions[err_position]:
           # Check if BERT's prediction is a chinese character
