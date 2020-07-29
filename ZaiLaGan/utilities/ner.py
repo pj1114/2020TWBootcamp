@@ -72,10 +72,11 @@ class NER():
             org = [(i, 'NS', j.start(), j.end()) for i in set(ORG) for j in re.finditer(i, sentence)]
             per+=loc
             per+=org
-            per = sorted(per, key=lambda x:x[2])
+            per = sorted(per, key=lambda x:(x[2],x[2]-x[3]))
             tmp_keep = []
-            left = per[0][2]
-            right = per[0][3]
+            if len(per)!=0:
+                left = per[0][2]
+                right = per[0][3]
             for idx in per:
                 if left==idx[2] and right==idx[3]:
                     tmp_keep.append(idx)
@@ -198,7 +199,7 @@ class NER():
                     new_sentence = j[0].join([new_sentence[:indicies[0]], new_sentence[indicies[1]:]])
                     if len(j[0])>j[3]-j[2]:
                         new_len = len(j[0])-(j[3]-j[2])
-                        tmp.extend(list(range(j[2]_cumlen, j[3]+cumlen+new_len)))
+                        tmp.extend(list(range(j[2]+cumlen, j[3]+cumlen+new_len)))
                         cumlen+=new_len
                     else:
                         tmp.extend(list(range(j[2]+cumlen, j[3]+cumlen)))

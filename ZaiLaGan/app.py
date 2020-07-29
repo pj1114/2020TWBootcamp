@@ -4,6 +4,7 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
 import yaml
 from zailagan import ZaiLaGan
+import os
 
 # Initialize application
 app = Flask(__name__)
@@ -15,6 +16,14 @@ with open("./config.yml", "r") as config_file_yaml:
 # Channel access token and secret
 line_bot_api = LineBotApi(config["Linebot"]["access_token"])
 handler = WebhookHandler(config["Linebot"]["secret"]) 
+
+# Add root path to all paths in configure
+model_path_list = ['gpt2_chinese','ner']
+dict_path_list = ['pinyin','stroke','common_char_set','custom_confusion','dictionary','place','person','ssc']
+for i in model_path_list:
+    config["Model"][i] = os.path.join(config["User"]["User_path"], config["Model"][i])
+for i in dict_path_list:
+    config["Data"][i] = os.path.join(config["User"]["User_path"], config["Data"][i])
 
 # Instantiate ZaiLaGan
 ZLG = ZaiLaGan(config)

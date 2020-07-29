@@ -1,17 +1,19 @@
+User:
+  User_path: /Users/lawrence70726/Desktop/Cinnamon AI/ZaiLaGan
 Linebot:
   access_token: M0tb09mdq8bGe9X5nIEnxU6XaKTVSv/BnMcQ5VndMjrt6SbJXzxcCeu5Ke5hsbGl+Yks70NcLzQKHqKRZJNpO+DdNbjxXidcR21kSgsdf62Is18y16sOYCCwhJGiT8eGk+Ujg0/1+1RPegC4X2kpCAdB04t89/1O/w1cDnyilFU=
   secret: 6ebc8d1f30c6a9d6de041e8a59a5cff2
 Model:
   bert_wwm_ext_chinese: hfl/chinese-bert-wwm-ext
-  gpt2_chinese: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/models/gpt2_chinese/prose_wiki_novel_finetuned
-  ner: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/utilities/NER/NER_data/data_path
+  gpt2_chinese: ZaiLaGan/models/gpt2_chinese/prose_wiki_novel_finetuned
+  ner: ZaiLaGan/utilities/NER/NER_data/data_path
   bert_base_chinese: bert-base-chinese
 Data:
-  pinyin: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/pinyin.pkl
-  stroke: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/stroke.pkl
-  common_char_set: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/common_char_set_t.txt
-  custom_confusion: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/confusion.txt
-  dictionary: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/word_dictionary/word_jieba.txt
-  place: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/ner/place.txt
-  person: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/ner/person.txt 
-  ssc: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/ner/sound_shape_code
+  pinyin: ZaiLaGan/data/spelling_error/pinyin.pkl
+  stroke: ZaiLaGan/data/spelling_error/stroke.pkl
+  common_char_set: ZaiLaGan/data/spelling_error/common_char_set_t.txt
+  custom_confusion: ZaiLaGan/data/spelling_error/confusion.txt
+  dictionary: ZaiLaGan/data/word_dictionary/word_jieba.txt
+  place: ZaiLaGan/data/ner/place.txt
+  person: ZaiLaGan/data/ner/person.txt 
+  ssc: ZaiLaGan/data/ner/sound_shape_code
