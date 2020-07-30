@@ -61,7 +61,7 @@ class ZaiLaGan():
         token_probability = torch.nn.Softmax(0)(scores)[self.bert_wwm_tokenizer.convert_tokens_to_ids(text[i])]
         if(token_probability < threshold):
           # Extract top predictions from BERT
-          token_scores, token_indices = scores.topk(2)
+          token_scores, token_indices = scores.topk(5)
           top_predicted_tokens = self.bert_wwm_tokenizer.convert_ids_to_tokens(token_indices)
           positions.append(i)
           predictions[i] = top_predicted_tokens
@@ -83,10 +83,10 @@ class ZaiLaGan():
       else:
         error_token = text[err_position]
         if(error_token in self.stroke):
-          for similar_token in self.stroke[error_token][:2]:
+          for similar_token in self.stroke[error_token][:5]:
             starting_positions[err_position].add(similar_token)
         if(error_token in self.pinyin):
-          for similar_token in self.pinyin[error_token][:2]:
+          for similar_token in self.pinyin[error_token][:10]:
             starting_positions[err_position].add(similar_token)
         for predicted_token in predictions[err_position]:
           # Check if BERT's prediction is a chinese character

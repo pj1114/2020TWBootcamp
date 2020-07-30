@@ -5,6 +5,7 @@ from linebot.models import *
 import yaml
 from zailagan import ZaiLaGan
 import os
+import traceback
 
 # Initialize application
 app = Flask(__name__)
@@ -63,7 +64,7 @@ def handle_message(event):
       if(err_position not in ne_positions):
         non_ne_err_count += 1
     # Too many detected errors
-    if(non_ne_err_count >= 4):
+    if(non_ne_err_count >= 3):
       reply("系統偵測到的錯字過多，很抱歉我們無法幫助您 :(")
     # Correct spelling errors
     else:
@@ -77,6 +78,7 @@ def handle_message(event):
       reply(response)
   except:
     print("failed :(")
+    traceback.print_exc()
 
 # Run application
 app.run()
