@@ -59,34 +59,54 @@ class NER():
         self.same_stroke = stroke
         self.ssc = ssc(ssc_dir)
     
+    def spliteKeyWord(self, str):
+        regex = r"[\u4e00-\ufaff]|[0-9]+|[a-zA-Z]+\'*[a-z]*"
+        matches = re.findall(regex, str, re.UNICODE)
+        return matches
+
+    def is_good_sentence(self, sentence):
+        tmp = self.spliteKeyWord(sentence)
+        if len(tmp)==0:
+            return False
+        cnt=0
+        for i in tmp:
+            if all(['\u4e00' <= x <= '\u9fff' for x in i]):
+              cnt+=1
+        return cnt/len(tmp)>=0.7
+
     def ner_process_document(self, article):
         #函數用來呼叫NER，讓NER能被多次使用
         data = list()
-        for sentence in article:
-            demo_sent = sentence.strip()
-            demo_data = [(demo_sent, ['O'] * len(demo_sent))]
-            tag = self.recognizer.demo_one(self.sess, demo_data)
-            PER, LOC, ORG = get_entity(tag, demo_sent)
-            per = [(i, 'NR', j.start(), j.end()) for i in set(PER)  for j in re.finditer(i, sentence)]
-            loc = [(i, 'NT', j.start(), j.end()) for i in set(LOC) for j in re.finditer(i, sentence)]
-            org = [(i, 'NS', j.start(), j.end()) for i in set(ORG) for j in re.finditer(i, sentence)]
-            per+=loc
-            per+=org
-            per = sorted(per, key=lambda x:(x[2],x[2]-x[3]))
-            tmp_keep = []
-            if len(per)!=0:
-                left = per[0][2]
-                right = per[0][3]
-            for idx in per:
-                if left==idx[2] and right==idx[3]:
-                    tmp_keep.append(idx)
-                elif left<=idx[2] and right>=idx[3]:
-                    continue
-                else:
-                    tmp_keep.append(idx)
-                    left = idx[2]
-                    right = idx[3]
-            data.append(tmp_keep)
+        for sentence in article: 
+            if self.is_good_sentence(sentence):
+                demo_sent = sentence.strip()
+                demo_data = [(demo_sent, ['O'] * len(demo_sent))]
+                tag = self.recognizer.demo_one(self.sess, demo_data)
+                PER, LOC, ORG = get_entity(tag, demo_sent)
+                per = [(i, 'NR', j.start(), j.end()) for i in set(PER)  for j in re.finditer(i, sentence)]
+                loc = [(i, 'NT', j.start(), j.end()) for i in set(LOC) for j in re.finditer(i, sentence)]
+                org = [(i, 'NS', j.start(), j.end()) for i in set(ORG) for j in re.finditer(i, sentence)]
+                per+=loc
+                per+=org
+                per = sorted(per, key=lambda x:(x[2],x[2]-x[3]))
+
+                tmp_keep = []
+                if len(per)!=0:
+                    left = per[0][2]
+                    right = per[0][3]
+
+                for idx in per:
+                    if left==idx[2] and right==idx[3]:
+                        tmp_keep.append(idx)
+                    elif left<=idx[2] and right>=idx[3]:
+                        continue
+                    else:
+                        tmp_keep.append(idx)
+                        left = idx[2]
+                        right = idx[3]
+                data.append(tmp_keep)
+            else:
+                data.append([])
         return data
 
     def throw_NER(self):
@@ -173,11 +193,17 @@ class NER():
             truth = []
             for i in ans:
                 if i[1] == 'NR':   ## Person
-                    person, change = self.find_similar(i[0], self.person_dict)
-                    truth.append((person,i[1],i[2],i[3], change))
+                    if all(['\u4e00' <= j <= '\u9fff' for j in i[0]]):
+                        person, change = self.find_similar(i[0], self.person_dict)
+                        truth.append((person,i[1],i[2],i[3], change))
+                    else:
+                        truth.append((i[0],i[1],i[2],i[3], 0))
                 elif i[1] == 'NT' or i[1] == 'NS':  ## place
-                    place, change = self.find_similar(i[0], self.place_dict)
-                    truth.append((place,i[1],i[2],i[3], change))
+                    if all(['\u4e00' <= j <= '\u9fff' for j in i[0]]):
+                        place, change = self.find_similar(i[0], self.place_dict)
+                        truth.append((place,i[1],i[2],i[3], change))
+                    else:
+                        truth.append((i[0],i[1],i[2],i[3], 0))
             all_truth.append(truth)
             del truth
         end = time.time()
@@ -185,6 +211,7 @@ class NER():
         return all_truth
     
     def check_ner(self, sentence):
+        sentence = [re.sub(r'[\x00-\x20\x7E-\xFF\u3000\xa0\t]', '',i) for i in sentence]
         all_truth = self.check_name(sentence)
         all_data = []
         for idx, i in enumerate(all_truth):

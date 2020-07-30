@@ -167,7 +167,14 @@ class ssc():
 	            multiplier.append(1)
 	        else:
 	            multiplier.append(0)
-	    multiplier.append(1- abs(self.strokesDictReverse[shapeCode1[-1]]-self.strokesDictReverse[shapeCode2[-1]])*1.0 / max(self.strokesDictReverse[shapeCode1[-1]],self.strokesDictReverse[shapeCode2[-1]]) )
+
+	    ## debug 
+	    max_shape_code = max(self.strokesDictReverse[shapeCode1[-1]], self.strokesDictReverse[shapeCode2[-1]])
+	    # if max_shape_code == 0:
+	    # 	multiplier.append(0)
+	    # else:
+	    multiplier.append(1- abs(self.strokesDictReverse[shapeCode1[-1]]-self.strokesDictReverse[shapeCode2[-1]])*1.0 
+	    	/ max_shape_code)
 	    shapeSimilarity=0
 	    for i in range(featureSize):
 	        shapeSimilarity += wights[i]*multiplier[i]
