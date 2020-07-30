@@ -207,7 +207,7 @@ class NER():
             all_truth.append(truth)
             del truth
         end = time.time()
-        print("NER time: %.2f" % (end-start))
+        #print("NER time: %.2f" % (end-start))
         return all_truth
     
     def check_ner(self, sentence):

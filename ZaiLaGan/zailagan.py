@@ -34,7 +34,7 @@ class ZaiLaGan():
     return self.ner_model.check_ner(sentences)
 
   # Detect potential spelling errors in a given sentence/paragraph and return detected error positions & top predictions from BERT
-  def detectSpellingError(self, text: str, threshold: float) -> Tuple[List[int],Dict[int,List[str]]]:
+  def detectSpellingError(self, text: str, threshold: float, topk: int) -> Tuple[List[int],Dict[int,List[str]]]:
     positions = []
     predictions = {}
     # Mask each word and predict it
@@ -61,20 +61,21 @@ class ZaiLaGan():
         token_probability = torch.nn.Softmax(0)(scores)[self.bert_wwm_tokenizer.convert_tokens_to_ids(text[i])]
         if(token_probability < threshold):
           # Extract top predictions from BERT
-          token_scores, token_indices = scores.topk(5)
+          token_scores, token_indices = scores.topk(topk)
           top_predicted_tokens = self.bert_wwm_tokenizer.convert_ids_to_tokens(token_indices)
           positions.append(i)
           predictions[i] = top_predicted_tokens
     return (positions, predictions)
 
   # Give top n suggestions of spelling error correction
-  def correctSpellingError(self, text: str, err_positions: Set[int], predictions: Dict[int,List[str]], ne_positions: Set[int], candidate_num: int) -> List[str]:
+  def correctSpellingError(self, text: str, err_positions: Set[int], predictions: Dict[int,List[str]], ne_positions: Set[int], candidate_num: int, similar_bonus: float) -> List[Tuple[str,int,float]]:
     # Initialize a dictionary to record starting positions of potentially correct tokens/words
     starting_positions = {}
     # Add original tokens
     for i in range(len(text)):
       token = text[i]
-      starting_positions[i] = set(token)
+      # Separate all tokens/words from tokens/words that are similar in stroke or pinyin
+      starting_positions[i] = (set(token), set(token))
     # Add similar tokens in stroke or pinyin
     for err_position in err_positions:
       # Check if the error token is included in a named-entity
@@ -84,29 +85,44 @@ class ZaiLaGan():
         error_token = text[err_position]
         if(error_token in self.stroke):
           for similar_token in self.stroke[error_token][:5]:
-            starting_positions[err_position].add(similar_token)
+            starting_positions[err_position][0].add(similar_token)
+            starting_positions[err_position][1].add(similar_token)
         if(error_token in self.pinyin):
           for similar_token in self.pinyin[error_token][:10]:
-            starting_positions[err_position].add(similar_token)
+            starting_positions[err_position][0].add(similar_token)
+            starting_positions[err_position][1].add(similar_token)
         for predicted_token in predictions[err_position]:
           # Check if BERT's prediction is a chinese character
           if(len(predicted_token) == 1 and self.utils.isChineseChar(predicted_token)):
-            starting_positions[err_position].add(predicted_token)
+            starting_positions[err_position][0].add(predicted_token)
     # Construct candidate sentences
     candidates = []
-    prefixes = list(starting_positions[0])
+    prefixes = list(starting_positions[0][0])
+    # Initialize counts of tokens/words that are similar in stroke or pinyin
+    for i in range(len(prefixes)):
+      if(prefixes[i] in starting_positions[0][1]):
+        prefixes[i] = (prefixes[i], 1)
+      else:
+        prefixes[i] = (prefixes[i], 0)
     while(len(prefixes) > 0):
       prefix = prefixes.pop(0)
-      if(len(prefix) == len(text)):
-        candidates.append((prefix,self.utils.getSentencePpl(prefix)))
+      if(len(prefix[0]) == len(text)):
+        candidates.append((prefix[0],prefix[1],self.utils.getSentencePpl(prefix[0])))
       else:
-        for suffix in starting_positions[len(prefix)]:
-          prefixes.append(prefix+suffix)
+        for suffix in starting_positions[len(prefix[0])][0]:
+          if(suffix in starting_positions[len(prefix[0])][1]):
+            prefixes.append((prefix[0]+suffix,prefix[1]+1))
+          else:
+            prefixes.append((prefix[0]+suffix,prefix[1]))
     # Sort candidate sentences by perplexity and get top n suggestions
-    candidates.sort(key = lambda x: x[1])
+    candidates.sort(key = lambda x: x[2])
     recommendations = []
     for i in range(min(len(candidates),candidate_num)):
-      recommendations.append(candidates[i][0])
+      recommendations.append(candidates[i])
+    # Take counts of tokens/words that are similar in stroke or pinyin into consideration and sort again
+    for i in range(len(recommendations)):
+      recommendations[i] = (recommendations[i][0], recommendations[i][1], recommendations[i][2]/pow(similar_bonus,recommendations[i][1]))
+    recommendations.sort(key = lambda x: x[2])
     return recommendations
 
   def generate_correction_cand(self, word):
