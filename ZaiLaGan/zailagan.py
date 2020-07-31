@@ -86,11 +86,11 @@ class ZaiLaGan():
       else:
         error_token = text[err_position]
         if(error_token in self.stroke):
-          for similar_token in self.stroke[error_token][:3]:
+          for similar_token in self.stroke[error_token][:5]:
             starting_positions[err_position][0].add(similar_token)
             starting_positions[err_position][1].add(similar_token)
         if(error_token in self.pinyin):
-          for similar_token in self.pinyin[error_token][:7]:
+          for similar_token in self.pinyin[error_token][:10]:
             starting_positions[err_position][0].add(similar_token)
             starting_positions[err_position][1].add(similar_token)
         for predicted_token in predictions[err_position]:
@@ -109,15 +109,21 @@ class ZaiLaGan():
     while(len(prefixes) > 0):
       prefix = prefixes.pop(0)
       if(len(prefix[0]) == len(text)):
-        candidates.append((prefix[0],prefix[1],self.utils.getSentencePpl(prefix[0])))
+        candidates.append((prefix[0],prefix[1],self.ngram_model.get_ppl(prefix[0])))
       else:
         for suffix in starting_positions[len(prefix[0])][0]:
           if(suffix in starting_positions[len(prefix[0])][1]):
             prefixes.append((prefix[0]+suffix,prefix[1]+1))
           else:
             prefixes.append((prefix[0]+suffix,prefix[1]))
-    # Sort candidate sentences by perplexity and get top n suggestions
+    # Sort candidate sentences by perplexities from ngram model
     candidates.sort(key = lambda x: x[2])
+    # Compute top candidate sentences' perplexities again with GPT2 and sort
+    candidates = candidates[:100]
+    for i in range(len(candidates)):
+      candidates[i] = (candidates[i][0], candidates[i][1], self.utils.getSentencePpl(candidates[i][0]))
+    candidates.sort(key = lambda x: x[2])
+    # Extract top n suggestions
     recommendations = []
     for i in range(min(len(candidates),candidate_num)):
       recommendations.append(candidates[i])

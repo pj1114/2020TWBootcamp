@@ -8,7 +8,7 @@ Model:
   bert_base_chinese: bert-base-chinese
   gpt2_chinese: models/gpt2_chinese/prose_wiki_novel_finetuned
   ner: utilities/NER/NER_data/data_path
-  ngram: models/bigram/language_wiki_bigram.model
+  ngram: models/trigram/language_wiki_trigram.model
 Data:
   pinyin: data/spelling_error/pinyin.pkl
   stroke: data/spelling_error/stroke.pkl
