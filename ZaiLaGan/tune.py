@@ -34,17 +34,18 @@ y_true = []
 y_pred = []
 for pair in pairs:
 	try:
-		wrong, correct, err_positions_true = pair[0], pair[1], pair[2]
+		wrong, err_positions_true = pair[0], pair[1]
 		# Perform named-entity recognition first
 		ner_processed_text, ne_positions = ZLG.detectNamedEntity([wrong])[0]
 		ne_positions = set(ne_positions)
 		# Detect spelling errors
-		err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 8e-3, 5)
+		err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 5e-4, 5)
 		# Remove potential spelling errors included in any named-entity
 		err_positions_pred = []
 		for err_position in err_positions:
 			if(err_position not in ne_positions):
 				err_positions_pred.append(err_position)
+		print(err_positions_pred, err_positions_true)
 		y_true.append(err_positions_true)
 		y_pred.append(err_positions_pred)
 	except:
