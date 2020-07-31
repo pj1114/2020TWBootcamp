@@ -174,7 +174,7 @@ class ZaiLaGan():
         
     return correction_candidates
 
-  def bertDetectAndCorrect(self, text: str, topk: int, ner_pos_list: List[int]) -> (List[int], str):
+  def bertDetectAndCorrect(self, text: str, topk: int, ner_pos_list: List[int]) -> Tuple[str, List[int]]:
     positions = []
     text_list = list(text)
     # split input text into short texts
@@ -250,5 +250,5 @@ class ZaiLaGan():
                   text_list[start_idx+idx] = topk_bert_cand
                   positions.append(start_idx+idx)
                   break
-    # return error position list, corrected string
-    return sorted(list(set(positions))), ''.join(text_list)
+    # return corrected string and error position list
+    return (''.join(text_list), sorted(list(set(positions))) )
