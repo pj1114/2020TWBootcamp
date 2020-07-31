@@ -19,5 +19,5 @@
 | ------------ | ------------ | ------------ | ------------ |
 | bigram | bigram | [ericahuang0516](https://github.com/ericahuang0516) | [Google Drive](https://drive.google.com/file/d/1kLe5WidWVjGRkuXwKACVp2lIDYvu7805/view?usp=sharing) |
 | trigram | trigram | [ericahuang0516](https://github.com/ericahuang0516) | [Google Drive](https://drive.google.com/file/d/1vu3bBauvFzPVCxRCnnJuRXZ-TCh2l6my/view?usp=sharing) |
-| 4gram | 4gram | [ericahuang0516](https://github.com/ericahuang0516) | [Google Drive](https://drive.google.com/file/d/1YyGRBQnriuOv-kTpaR9QcYfuqG1hQ0h0/view?usp=sharing) |
+| 4gram | 4gram | [ericahuang0516](https://github.com/ericahuang0516) | [Google Drive](https://drive.google.com/file/d/14MKOpbSDqRKqZnGl4vPst7Qqsr7uxYJk/view?usp=sharing) |
 | 5gram | 5gram | [ericahuang0516](https://github.com/ericahuang0516) | [Google Drive](https://drive.google.com/file/d/1qHa469fuFE9yyAXNNyNcyqfRCiXBbLWy/view?usp=sharing) |
