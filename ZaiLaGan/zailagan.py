@@ -5,6 +5,7 @@ from utilities.utils import Utils
 from utilities.ner import *
 import re
 from pypinyin import lazy_pinyin
+from utilities.ngram import *
 
 class ZaiLaGan():
   # Initialize config, device, model, tokenizer, and utilities
@@ -28,6 +29,7 @@ class ZaiLaGan():
     self.ner_model = NER(self.config["Model"]["ner"], self.pinyin, self.stroke, self.place, self.person, self.config["Data"]["ssc"])
     self.charSet = self.utils.loadCharSet(self.config['Data']['common_char_set'])
     self.customConfusionDict = self.utils.loadCustomConfusion(self.config['Data']['confusion'])
+    self.ngram_model = NGRAM(config["Model"]["ngram"])
 
   # Detect named-entities and return their corrections & positions
   def detectNamedEntity(self, sentences: List[str]) -> List[Tuple[str,List[int]]]:
