@@ -8,4 +8,4 @@ class NGRAM():
 		self.model = KneserNey.load(self.model_path)
 	def get_ppl(self, sentence):
 		L = self.model.evaluateSent(sentence)
-    	return pow(math.exp(1), -L/len(sentence))
+		return pow(math.exp(1), -L/len(sentence))
