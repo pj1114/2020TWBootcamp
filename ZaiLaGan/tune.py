@@ -39,7 +39,7 @@ for pair in pairs:
 		ner_processed_text, ne_positions = ZLG.detectNamedEntity([wrong])[0]
 		ne_positions = set(ne_positions)
 		# Detect spelling errors
-		err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 8e-3)
+		err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 8e-3, 5)
 		# Remove potential spelling errors included in any named-entity
 		err_positions_pred = []
 		for err_position in err_positions:

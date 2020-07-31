@@ -55,27 +55,31 @@ def handle_message(event):
     # Perform named-entity recognition first
     ner_processed_text, ne_positions = ZLG.detectNamedEntity([event.message.text])[0]
     ne_positions = set(ne_positions)
-    # Detect spelling errors
-    err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 8e-3, 5)
-    err_positions = set(err_positions)
-    # Count the number of errors that are not included in any named-entity
-    non_ne_err_count = 0
-    for err_position in err_positions:
-      if(err_position not in ne_positions):
-        non_ne_err_count += 1
-    # Too many detected errors
-    if(non_ne_err_count >= 3):
-      reply("系統偵測到的錯字過多，很抱歉我們無法幫助您 :(")
-    # Correct spelling errors
+    # Call different correctors according to length of input
+    if(len(event.message.text) <= 8):
+      print(ZLG.bertDetectAndCorrect(ner_processed_text, 3))
     else:
-      recommendations = ZLG.correctSpellingError(ner_processed_text, err_positions, bert_predictions, ne_positions, 5, 1.5)
-      response = "*****輸入*****\n" + event.message.text + "\n*****輸出*****\n"
-      for i in range(len(recommendations)):
-        if(i != len(recommendations)-1):
-          response += str(i+1) + ". " + recommendations[i][0] + " (" + str(recommendations[i][2]) + ")" + "\n"
-        else:
-          response += str(i+1) + ". " + recommendations[i][0] + " (" + str(recommendations[i][2]) + ")"
-      reply(response)
+      # Detect spelling errors
+      err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 1e-2, 3)
+      err_positions = set(err_positions)
+      # Count the number of errors that are not included in any named-entity
+      non_ne_err_count = 0
+      for err_position in err_positions:
+        if(err_position not in ne_positions):
+          non_ne_err_count += 1
+      # Too many detected errors
+      if(non_ne_err_count >= 4):
+        reply("系統偵測到的錯字過多，很抱歉我們無法幫助您 :(")
+      # Correct spelling errors
+      else:
+        recommendations = ZLG.correctSpellingError(ner_processed_text, err_positions, bert_predictions, ne_positions, 5, 1.5)
+        response = "*****輸入*****\n" + event.message.text + "\n*****輸出*****\n"
+        for i in range(len(recommendations)):
+          if(i != len(recommendations)-1):
+            response += str(i+1) + ". " + recommendations[i][0] + " (" + str(recommendations[i][2]) + ")" + "\n"
+          else:
+            response += str(i+1) + ". " + recommendations[i][0] + " (" + str(recommendations[i][2]) + ")"
+        reply(response)
   except:
     print("failed :(")
     traceback.print_exc()

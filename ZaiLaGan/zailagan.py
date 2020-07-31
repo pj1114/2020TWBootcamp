@@ -84,11 +84,11 @@ class ZaiLaGan():
       else:
         error_token = text[err_position]
         if(error_token in self.stroke):
-          for similar_token in self.stroke[error_token][:5]:
+          for similar_token in self.stroke[error_token][:3]:
             starting_positions[err_position][0].add(similar_token)
             starting_positions[err_position][1].add(similar_token)
         if(error_token in self.pinyin):
-          for similar_token in self.pinyin[error_token][:10]:
+          for similar_token in self.pinyin[error_token][:7]:
             starting_positions[err_position][0].add(similar_token)
             starting_positions[err_position][1].add(similar_token)
         for predicted_token in predictions[err_position]:

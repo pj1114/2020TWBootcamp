@@ -33,7 +33,7 @@ class SpellingErrorMetrics():
     precision = self.detection_precision(y_pred, y_true)
     return (2*recall*precision) / (recall+precision)
 
-  def error_location_accuracy(y_pred, y_true):
+  def error_location_accuracy(self, y_pred, y_true):
     TP_TN = 0
     for i, j in zip(y_pred, y_true):
       if i == j:
