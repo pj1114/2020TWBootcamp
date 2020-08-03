@@ -13,7 +13,7 @@ pip3 install pickle --upgrade
 pip3 install jellyfish --upgrade
 pip3 install pypinyin --upgrade
 pip3 install tensorflow==2.2.0
-pip3 install tensorflow_addons --upgrade
-pip3 install tensorflow-gpu --upgrade
+pip3 install tensorflow_addons
+pip3 install tensorflow-gpu
 pip3 install re --upgrade
 pip3 install knlm --upgrade

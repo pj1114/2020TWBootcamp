@@ -119,7 +119,7 @@ class ZaiLaGan():
     # Sort candidate sentences by perplexities from ngram model
     candidates.sort(key = lambda x: x[2])
     # Compute top candidate sentences' perplexities again with GPT2 and sort
-    candidates = candidates[:100]
+    candidates = candidates[:50]
     for i in range(len(candidates)):
       candidates[i] = (candidates[i][0], candidates[i][1], self.utils.getSentencePpl(candidates[i][0]))
     candidates.sort(key = lambda x: x[2])

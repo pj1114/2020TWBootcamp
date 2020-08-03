@@ -49,41 +49,68 @@ def handle_message(event):
   # Reply message to user
   def reply(text):
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text = text))
-  # Correct input sentence's spelling errors
   try:
-    print("handling input: " + event.message.text)
-    # Perform named-entity recognition first
-    ner_processed_text, ne_positions = ZLG.detectNamedEntity([event.message.text])[0]
-    ne_positions = set(ne_positions)
-    # Call different correctors according to length of input
-    if(len(event.message.text) <= 5):
-      print(ZLG.bertDetectAndCorrect(ner_processed_text, 3))
-    else:
+    # Check if the state should be changed
+    if(event.message.text == "***文本偵錯***"):
+      handle_message.state = "spelling_error_detection"
+      reply("Spelling error detection service activated!")
+      return
+    elif(event.message.text == "***文本修正***"):
+      handle_message.state = "spelling_error_correction"
+      reply("Spelling error correction service activated!")
+      return
+    elif(event.message.text == "***文法修正***"):
+      handle_message.state = "grammar_error_correction"
+      reply("Grammar error correction service activated!")
+      return
+    # Check the state to support different services
+    if(handle_message.state == "init"):
+      reply("Please select a service from the rich menu first!")
+    elif(handle_message.state == "spelling_error_detection"):
+      print("Handling spelling error detection with input: " + event.message.text)
+      # Perform named-entity recognition first
+      ner_processed_text, ne_positions = ZLG.detectNamedEntity([event.message.text])[0]
+      ne_positions = set(ne_positions)
       # Detect spelling errors
-      err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 8e-3, 3)
-      err_positions = set(err_positions)
-      # Count the number of errors that are not included in any named-entity
-      non_ne_err_count = 0
+      err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 1e-5, 3)
+      # Extract errors not included in any named-entity
+      non_ne_err_positions = []
       for err_position in err_positions:
         if(err_position not in ne_positions):
-          non_ne_err_count += 1
-      print("there are " + str(non_ne_err_count) + " spelling errors")
-      # Too many detected errors
-      if(non_ne_err_count > 8):
-        reply("系統偵測到的錯字過多，很抱歉我們無法幫助您 :(")
-      # Correct spelling errors
+          non_ne_err_positions.append(err_position)
+      # Reply detection result to user
+      offset = 0
+      result = event.message.text
+      for position in non_ne_err_positions:
+        result = result[:position+offset] + "「" + result[position+offset] + "」" + result[position+1+offset:]
+        offset += 2
+      reply("Spelling error detection result: \n" + result)
+    elif(handle_message.state == "spelling_error_correction"):
+      print("Handling spelling error correction with input: " + event.message.text)
+      # Perform named-entity recognition first
+      ner_processed_text, ne_positions = ZLG.detectNamedEntity([event.message.text])[0]
+      # Call different correctors according to length of input
+      if(len(event.message.text) <= 8):
+        result = ZLG.bertDetectAndCorrect(ner_processed_text, 3, ne_positions)[0]
+        # Reply correction result to user
+        reply("Spelling error correction result: \n" + result)
       else:
-        recommendations = ZLG.correctSpellingError(ner_processed_text, err_positions, bert_predictions, ne_positions, 5, 2.5)
-        response = "*****輸入*****\n" + event.message.text + "\n*****輸出*****\n"
-        for i in range(len(recommendations)):
-          if(i != len(recommendations)-1):
-            response += str(i+1) + ". " + recommendations[i][0] + " (" + str(recommendations[i][2]) + ")" + "\n"
-          else:
-            response += str(i+1) + ". " + recommendations[i][0] + " (" + str(recommendations[i][2]) + ")"
-        reply(response)
+        ne_positions = set(ne_positions)
+        # Detect spelling errors
+        err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 5e-3, 3)
+        err_positions = set(err_positions)
+        # Correct spelling errors
+        result = ZLG.correctSpellingError(ner_processed_text, err_positions, bert_predictions, ne_positions, 1, 3)[0][0]
+        # Reply correction result to user
+        reply("Spelling error correction result: \n" + result)
+    else:
+      print("Handling grammar error correction with input: " + event.message.text)
+      reply("Sorry, grammar error correction service can't be supported now...")
   except:
-    print("failed :(")
     traceback.print_exc()
+
+# Initialize state of function
+setattr(handle_message, "state", "init")
 
 # Run application
 app.run()
