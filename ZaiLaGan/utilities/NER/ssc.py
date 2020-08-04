@@ -45,8 +45,8 @@ class ssc():
 		               'L':21, 'M':22, 'N':23, 'O':24, 'P':25, 'Q':26, 'R':27, 'S':28, 'T':29, 'U':30,
 		               'V':31, 'W':32, 'X':33, 'Y':34, 'Z':35, '0':0}
 
-		self.soundWeight=0.5
-		self.shapeWeight=0.5
+		self.soundWeight=0.7
+		self.shapeWeight=0.3
 		self.hanziStrokesDict = self.getHanziStrokesDict(path)
 		self.hanziStructureDict = self.getHanziStructureDict(path)
 		self.hanziSSCDict = self.getHanziSSCDict(path)
