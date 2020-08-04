@@ -32,8 +32,8 @@ class ZaiLaGan():
     self.ngram_model = NGRAM(config["Model"]["ngram"])
 
   # Detect named-entities and return their corrections & positions
-  def detectNamedEntity(self, sentences: List[str]) -> List[Tuple[str,List[int]]]:
-    return self.ner_model.check_ner(sentences)
+  def detectNamedEntity(self, sentences: List[str], task_name:str) -> List[Tuple[str,List[int]]]:
+    return self.ner_model.check_ner(sentences, task_name)
 
   # Detect potential spelling errors in a given sentence/paragraph and return detected error positions & top predictions from BERT
   def detectSpellingError(self, text: str, threshold: float, topk: int) -> Tuple[List[int],Dict[int,List[str]]]:

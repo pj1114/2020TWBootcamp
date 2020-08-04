@@ -69,7 +69,7 @@ def handle_message(event):
     elif(handle_message.state == "spelling_error_detection"):
       print("Handling spelling error detection with input: " + event.message.text)
       # Perform named-entity recognition first
-      ner_processed_text, ne_positions = ZLG.detectNamedEntity([event.message.text])[0]
+      ner_processed_text, ne_positions = ZLG.detectNamedEntity([event.message.text], 'detection')[0]
       ne_positions = set(ne_positions)
       # Detect spelling errors
       err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 1e-5, 3)
@@ -88,7 +88,7 @@ def handle_message(event):
     elif(handle_message.state == "spelling_error_correction"):
       print("Handling spelling error correction with input: " + event.message.text)
       # Perform named-entity recognition first
-      ner_processed_text, ne_positions = ZLG.detectNamedEntity([event.message.text])[0]
+      ner_processed_text, ne_positions = ZLG.detectNamedEntity([event.message.text], 'correction')[0]
       # Call different correctors according to length of input
       if(len(event.message.text) <= 8):
         result = ZLG.bertDetectAndCorrect(ner_processed_text, 3, ne_positions)[0]
