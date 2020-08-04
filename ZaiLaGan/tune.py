@@ -40,7 +40,7 @@ for threshold in thresholds:
 		try:
 			wrong, err_positions_true = pair[0], pair[1]
 			# Perform named-entity recognition first
-			ner_processed_text, ne_positions = ZLG.detectNamedEntity([wrong])[0]
+			ner_processed_text, ne_positions, ne_err_positions = ZLG.detectNamedEntity([wrong], "detection")[0]
 			ne_positions = set(ne_positions)
 			# Detect spelling errors
 			err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, threshold, 5)
