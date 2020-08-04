@@ -8,8 +8,6 @@ class wordSub():
 		self.ws = WS(ws_model_path)
 		self.pos = POS(pos_model_path)
 		self.model = Word2Vec.load(w2v_model_path)
-		self.w2v_results = []
-		self.PIC_results = []
 
 	def _PIC(self, target, sub, context, z1=2, z2=2):
 		p_st = np.dot(sub.T,target)
@@ -21,6 +19,9 @@ class wordSub():
 		word_sentence_list = self.ws([input_text])
 		pos_sentence_list = self.pos(word_sentence_list)[0]
 		word_sentence_list = word_sentence_list[0]
+
+		w2v_results = []
+		PIC_results = []
 
 		replaced_candidates = []
 		context = [self.model[w] for w in word_sentence_list if w in self.model]
@@ -34,7 +35,7 @@ class wordSub():
 				for sub in candidates:
 					cand_score_dict[sub]=self._PIC(self.model[word], self.model[sub], context)
 				# word2vec's results
-				self.w2v_results.append((word, candidates))
+				w2v_results.append((word, candidates))
 				# PIC metric's results
-				self.PIC_results.append((word, sorted(candidates, key=lambda k: cand_score_dict[k], reverse=True)))
-		return self.w2v_results, self.PIC_results 
+				PIC_results.append((word, sorted(candidates, key=lambda k: cand_score_dict[k], reverse=True)))
+		return w2v_results, PIC_results 
