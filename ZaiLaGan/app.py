@@ -80,7 +80,7 @@ def handle_message(event):
           non_ne_err_positions.append(err_position)
       # Reply detection result to user
       offset = 0
-      result = event.message.text
+      result = ner_processed_text
       for position in non_ne_err_positions:
         result = result[:position+offset] + "「" + result[position+offset] + "」" + result[position+1+offset:]
         offset += 2
