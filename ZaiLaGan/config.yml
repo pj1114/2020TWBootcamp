@@ -1,8 +1,8 @@
 User:
-  user_path: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan
+  user_path: /Users/lawrence70726/Desktop/Cinnamon AI/ZaiLaGan/ZaiLaGan
 Linebot:
-  access_token: C5m+zW/LnOmUr3SBI5rgzPCUUUAF0YlaXa0WrTnVzDaAzL1jsh7i4mAsLufVF6G99vtW+KzWXvMZOUsx6WEtylKl8dQ4vtaYfUJF1G3kb9qF5juIacIntP4qoW9EjchVj17WwL1qhNWzFTj+CGbr9QdB04t89/1O/w1cDnyilFU=
-  secret: 8394f386b022f82de1b2925c51487dbf
+  access_token: o/HbZ/kQHRG4f+px312o6Y9dNG1FclBOe8aqWjy+dC9gkY4G3IYS4obTUlfiky/xZkkRQeJOLXFv6cNG7f9Ovy2wm7MYtlurhEKRykUSpOUDXfTN9ouiQDaszVVhnHeB7Kg7xD+gQpsEZCDAqh92IAdB04t89/1O/w1cDnyilFU=
+  secret: 6347703958c63da7e0b5e622e47758e8
 Model:
   bert_wwm_ext_chinese: hfl/chinese-bert-wwm-ext
   bert_base_chinese: bert-base-chinese
