@@ -129,7 +129,8 @@ class NER():
                 if jwscore < 0.4:
                     continue
                 else:
-                    current_score = self.harmonic_mean(jwscore, self.ssc.compute_similarity(x, current_string))
+                    len_score = 1 if len(current_string)==len(x) else 0.8
+                    current_score = self.harmonic_mean(jwscore, self.ssc.compute_similarity(x, current_string)) * len_score
                 if(current_score > highest_jw):
                     highest_jw = current_score
                     best_match = current_string
@@ -164,7 +165,7 @@ class NER():
                 for j, idx in enumerate(position):
                     if j==0 and idx+1 == max(len(best), len(name)) and len(best) != len(name) and min(len(best),len(name))>=2:
                         flag=1
-                        return best, flag
+                        return best, flag, position
                     if idx+1>len(best) or idx+1>len(name):
                         break
                     try:
@@ -181,12 +182,12 @@ class NER():
 
                 if cnt==len(position):
                     flag=1
-                    return best, flag
+                    return best, flag, position
                     
-        return name, flag
+        return name, flag, position
       
     def check_name(self, sentence):
-        start = time.time()
+        # start = time.time()
         answer = self.get_NER(sentence)
         all_truth = []
         for ans in answer:
@@ -194,27 +195,26 @@ class NER():
             for i in ans:
                 if i[1] == 'NR':   ## Person
                     if all(['\u4e00' <= j <= '\u9fff' for j in i[0]]):
-                        person, change = self.find_similar(i[0], self.person_dict)
-                        truth.append((person,i[1],i[2],i[3], change))
+                        person, change, position = self.find_similar(i[0], self.person_dict)
+                        truth.append((person,i[1],i[2],i[3], change, position))
                     else:
-                        truth.append((i[0],i[1],i[2],i[3], 0))
+                        truth.append((i[0],i[1],i[2],i[3], 0, []))
                 elif i[1] == 'NT' or i[1] == 'NS':  ## place
                     if all(['\u4e00' <= j <= '\u9fff' for j in i[0]]):
-                        place, change = self.find_similar(i[0], self.place_dict)
-                        truth.append((place,i[1],i[2],i[3], change))
+                        place, change, position = self.find_similar(i[0], self.place_dict)
+                        truth.append((place,i[1],i[2],i[3], change, position))
                     else:
-                        truth.append((i[0],i[1],i[2],i[3], 0))
+                        truth.append((i[0],i[1],i[2],i[3], 0, []))
             all_truth.append(truth)
             del truth
-        end = time.time()
+        # end = time.time()
         #print("NER time: %.2f" % (end-start))
         return all_truth
     
     def check_ner(self, sentence, task_name='correction'):
         sentence = [re.sub(r'[\x00-\x20\x7E-\xFF\u3000\xa0\t]', '',i) for i in sentence]
-        all_truth = self.check_name(sentence)
         all_data = []
-
+        all_truth = self.check_name(sentence)
         if task_name=='correction':
             for idx, i in enumerate(all_truth):
                 tmp = []
@@ -235,11 +235,14 @@ class NER():
                 all_data.append((new_sentence, tmp))
         elif task_name=='detection':
             for idx, i in enumerate(all_truth):
+                tmp_pos=[]
                 new_sentence = sentence[idx]
                 tmp = []
                 for j in i:
+                    if j[4]==1:
+                        tmp_pos.extend([j[2]+i for i in j[5] if j[2]+i < j[3] ])
                     tmp.extend(list(range(j[2], j[3])))
-                all_data.append((new_sentence, tmp))
+                all_data.append((new_sentence, tmp, tmp_pos))
         return all_data
 
 
