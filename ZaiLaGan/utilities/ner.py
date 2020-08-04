@@ -210,27 +210,36 @@ class NER():
         #print("NER time: %.2f" % (end-start))
         return all_truth
     
-    def check_ner(self, sentence):
+    def check_ner(self, sentence, task_name='correction'):
         sentence = [re.sub(r'[\x00-\x20\x7E-\xFF\u3000\xa0\t]', '',i) for i in sentence]
         all_truth = self.check_name(sentence)
         all_data = []
-        for idx, i in enumerate(all_truth):
-            tmp = []
-            new_sentence = sentence[idx]
-            cumlen = 0
-            for j in i:
-                if j[2]+1==j[3]:
-                    continue
-                else:
-                    indicies = (j[2]+cumlen,j[3]+cumlen)
-                    new_sentence = j[0].join([new_sentence[:indicies[0]], new_sentence[indicies[1]:]])
-                    if len(j[0])>j[3]-j[2]:
-                        new_len = len(j[0])-(j[3]-j[2])
-                        tmp.extend(list(range(j[2]+cumlen, j[3]+cumlen+new_len)))
-                        cumlen+=new_len
+
+        if task_name=='correction':
+            for idx, i in enumerate(all_truth):
+                tmp = []
+                new_sentence = sentence[idx]
+                cumlen = 0
+                for j in i:
+                    if j[2]+1==j[3]:
+                        continue
                     else:
-                        tmp.extend(list(range(j[2]+cumlen, j[3]+cumlen)))
-            all_data.append((new_sentence, tmp))
+                        indicies = (j[2]+cumlen,j[3]+cumlen)
+                        new_sentence = j[0].join([new_sentence[:indicies[0]], new_sentence[indicies[1]:]])
+                        if len(j[0])>j[3]-j[2]:
+                            new_len = len(j[0])-(j[3]-j[2])
+                            tmp.extend(list(range(j[2]+cumlen, j[3]+cumlen+new_len)))
+                            cumlen+=new_len
+                        else:
+                            tmp.extend(list(range(j[2]+cumlen, j[3]+cumlen)))
+                all_data.append((new_sentence, tmp))
+        elif task_name=='detection':
+            for idx, i in enumerate(all_truth):
+                new_sentence = sentence[idx]
+                tmp = []
+                for j in i:
+                    tmp.extend(list(range(j[2], j[3])))
+                all_data.append((new_sentence, tmp))
         return all_data
 
 
