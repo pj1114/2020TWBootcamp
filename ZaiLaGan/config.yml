@@ -9,6 +9,9 @@ Model:
   gpt2_chinese: models/gpt2_chinese/prose_wiki_novel_finetuned
   ner: utilities/NER/NER_data/data_path
   ngram: models/5gram/language_wiki_5gram.model
+  w2v_model: models/word2vec/word2vec.model
+  ws_model: models/ckip
+  pos_model: models/ckip
 Data:
   pinyin: data/spelling_error/pinyin.pkl
   stroke: data/spelling_error/stroke.pkl

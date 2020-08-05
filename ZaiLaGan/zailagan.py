@@ -30,6 +30,7 @@ class ZaiLaGan():
     self.charSet = self.utils.loadCharSet(self.config['Data']['common_char_set'])
     self.customConfusionDict = self.utils.loadCustomConfusion(self.config['Data']['confusion'])
     self.ngram_model = NGRAM(config["Model"]["ngram"])
+    self.wordSub_model = wordSub(config["Model"]["ws_model"], onfig["Model"]["pos_model"], onfig["Model"]["w2v_model"])
 
   # Detect named-entities and return their corrections & positions
   def detectNamedEntity(self, sentences: List[str], task_name:str) -> List[Tuple[str,List[int]]]:
