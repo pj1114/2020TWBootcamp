@@ -5,6 +5,7 @@ from .trie import Trie
 import codecs
 import pickle
 
+# Utility functions
 class Utils:
 	# Initialize config, device, model, and tokenizer
 	def __init__(self, config):
@@ -106,3 +107,108 @@ class Utils:
 			return True
 		else:
 			return False
+
+# Utility variables
+spelling_error_detection_reply_template = {
+  "type": "bubble",
+  "size": "kilo",
+  "body": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "text",
+        "text": "文本偵錯結果",
+        "weight": "bold",
+        "style": "normal",
+        "size": "md",
+        "color": "#1DB446"
+      },
+      {
+        "type": "text",
+        "text": "Spelling Error Detection Result",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "sm",
+        "color": "#aaaaaa"
+      },
+      {
+        "type": "separator",
+        "margin": "lg"
+      },
+      {
+        "type": "text",
+        "text": "輸入",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "lg",
+        "color": "#5299CB"
+      },
+      {
+        "type": "text",
+        "text": "Input",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "sm",
+        "color": "#aaaaaa"
+      },
+      {
+        "type": "text",
+        "text": "placeholder",
+        "weight": "regular",
+        "style": "normal",
+        "size": "sm",
+        "margin": "sm",
+        "wrap": True
+      },
+      {
+        "type": "separator",
+        "margin": "lg"
+      },
+      {
+        "type": "text",
+        "text": "輸出",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "lg",
+        "color": "#5299CB"
+      },
+      {
+        "type": "text",
+        "text": "Output",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "sm",
+        "color": "#aaaaaa"
+      },
+      {
+        "type": "text",
+        "contents": [
+          {
+            "type": "span",
+            "text": "placeholder",
+            "size": "sm"
+          }
+        ],
+        "margin": "sm",
+        "wrap": True
+      }
+    ]
+  }
+}
+spelling_error_detection_output_span_template = {
+  "type": "span",
+  "text": "placeholder",
+  "size": "sm"
+}
+spelling_error_detection_output_error_span_template = {
+  "type": "span",
+  "text": "placeholder",
+  "size": "sm",
+  "color": "#CD4F39"
+}
