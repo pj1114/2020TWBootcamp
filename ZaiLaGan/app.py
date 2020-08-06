@@ -6,6 +6,7 @@ import yaml
 from zailagan import ZaiLaGan
 import os
 import traceback
+from utilities.utils import spelling_error_detection_reply_template, spelling_error_detection_output_span_template, spelling_error_detection_output_error_span_template
 
 # Initialize application
 app = Flask(__name__)
@@ -20,7 +21,7 @@ handler = WebhookHandler(config["Linebot"]["secret"])
 
 # Concatenate root path with all subpaths
 root_path = config["User"]["user_path"]
-model_names = ["gpt2_chinese", "ner", "ngram"]
+model_names = ["gpt2_chinese", "ner", "ngram", "w2v_model", "ws_model", "pos_model"]
 data_names = ["pinyin", "stroke", "dictionary", "common_char_set", "confusion", "place", "person", "ssc"]
 for model_name in model_names:
     config["Model"][model_name] = os.path.join(root_path, config["Model"][model_name])
@@ -79,14 +80,28 @@ def handle_message(event):
         if(err_position not in ne_positions):
           non_ne_err_positions.append(err_position)
       # Reply detection result to user
-      offset = 0
-      result = ner_processed_text
-      non_ne_err_positions += ne_err_positions
-      non_ne_err_positions = sorted(non_ne_err_positions)
-      for position in non_ne_err_positions:
-        result = result[:position+offset] + "「" + result[position+offset] + "」" + result[position+1+offset:]
-        offset += 2
-      reply("Spelling error detection result: \n" + result)
+      err_positions = set(non_ne_err_positions+ne_err_positions)
+      spelling_error_detection_reply = spelling_error_detection_reply_template.copy()
+      # Fill in input
+      spelling_error_detection_reply["body"]["contents"][5]["text"] = event.message.text
+      # Fill in output
+      if(len(err_positions) == 0):
+        spelling_error_detection_output_span = spelling_error_detection_output_span_template.copy()
+        spelling_error_detection_output_span["text"] = event.message.text
+        spelling_error_detection_reply["body"]["contents"][9]["contents"] = [spelling_error_detection_output_span]
+      else:
+        spelling_error_detection_output_spans = []
+        for i in range(len(ner_processed_text)):
+          if(i in err_positions):
+            spelling_error_detection_output_error_span = spelling_error_detection_output_error_span_template.copy()
+            spelling_error_detection_output_error_span["text"] = ner_processed_text[i]
+            spelling_error_detection_output_spans.append(spelling_error_detection_output_error_span)
+          else:
+            spelling_error_detection_output_span = spelling_error_detection_output_span_template.copy()
+            spelling_error_detection_output_span["text"] = ner_processed_text[i]
+            spelling_error_detection_output_spans.append(spelling_error_detection_output_span)
+        spelling_error_detection_reply["body"]["contents"][9]["contents"] = spelling_error_detection_output_spans
+      line_bot_api.reply_message(event.reply_token, FlexSendMessage(alt_text = "文本偵錯結果", contents = spelling_error_detection_reply))
     elif(handle_message.state == "spelling_error_correction"):
       print("Handling spelling error correction with input: " + event.message.text)
       # Perform named-entity recognition first
