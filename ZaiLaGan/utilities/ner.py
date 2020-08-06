@@ -212,7 +212,7 @@ class NER():
         return all_truth
     
     def check_ner(self, sentence, task_name='correction'):
-        sentence = [re.sub(r'[\x00-\x20\x7E-\xFF\u3000\xa0\t]', '',i) for i in sentence]
+        sentence = [re.sub(r'[\x00-\x19\x7E-\xFF\u3000\xa0\t]', '',i) for i in sentence]
         all_data = []
         all_truth = self.check_name(sentence)
         if task_name=='correction':
