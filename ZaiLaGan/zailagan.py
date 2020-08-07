@@ -86,6 +86,7 @@ class ZaiLaGan():
         continue
       else:
         error_token = text[err_position]
+        ssc_target = self.ner_model.ssc.getSoundCode(error_token)
         if(error_token in self.stroke):
           for similar_token in self.stroke[error_token][:3]:
             starting_positions[err_position][0].add(similar_token)
@@ -98,7 +99,6 @@ class ZaiLaGan():
           # Check if BERT's prediction is a chinese character
           if(len(predicted_token) == 1 and self.utils.isChineseChar(predicted_token)):
             starting_positions[err_position][0].add(predicted_token)
-            ssc_target = self.ner_model.ssc.getSoundCode(text[err_position])
             ssc_pred = self.ner_model.ssc.getSoundCode(predicted_token)
             ssc_score = self.ner_model.ssc.computeSoundCodeSimilarity(ssc_target, ssc_pred)
             if ssc_score >= 0.7 :
