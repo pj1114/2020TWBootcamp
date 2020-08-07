@@ -212,3 +212,472 @@ spelling_error_detection_output_error_span_template = {
   "size": "sm",
   "color": "#CD4F39"
 }
+carousel_menu = {
+  "type": "carousel",
+  "contents": [
+    {
+      "type": "bubble",
+      "size": "kilo",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "文本偵錯",
+            "color": "#ffffff",
+            "align": "start",
+            "size": "xl",
+            "gravity": "center",
+            "decoration": "none",
+            "weight": "bold",
+            "wrap": True
+          },
+          {
+            "type": "text",
+            "text": "Spelling Error Detection",
+            "color": "#ffffff",
+            "align": "start",
+            "size": "md",
+            "gravity": "center",
+            "margin": "lg",
+            "weight": "regular",
+            "wrap": True
+          }
+        ],
+        "backgroundColor": "#27ACB2",
+        "paddingTop": "19px",
+        "paddingAll": "12px",
+        "paddingBottom": "25px",
+        "margin": "none"
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Introduction: ",
+                "color": "#8C8C8C",
+                "size": "sm",
+                "wrap": True
+              },
+              {
+                "type": "text",
+                "text": "幫助使用者於文本中自動偵測錯字，節省使用者大量的時間。",
+                "wrap": True,
+                "margin": "lg"
+              },
+              {
+                "type": "text",
+                "text": "A spelling error detection machine for users intending to look for typos in their articles.",
+                "wrap": True,
+                "margin": "lg"
+              }
+            ],
+            "flex": 1,
+            "height": "230px"
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Detect",
+                "action": {
+                  "type": "message",
+                  "label": "Detect",
+                  "text": "Detect"
+                },
+                "color": "#1093d4",
+                "position": "relative",
+                "decoration": "none",
+                "style": "normal",
+                "weight": "regular",
+                "align": "center",
+                "offsetTop": "3px"
+              }
+            ],
+            "borderColor": "#1093d4",
+            "borderWidth": "1px",
+            "cornerRadius": "5px",
+            "height": "30px"
+          }
+        ],
+        "spacing": "md",
+        "paddingAll": "12px",
+        "height": "300px"
+      },
+      "styles": {
+        "footer": {
+          "separator": False
+        }
+      }
+    },
+    {
+      "type": "bubble",
+      "size": "kilo",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "文本修正",
+            "color": "#ffffff",
+            "align": "start",
+            "size": "xl",
+            "gravity": "center",
+            "decoration": "none",
+            "weight": "bold"
+          },
+          {
+            "type": "text",
+            "text": "Spelling Error Correction",
+            "color": "#ffffff",
+            "align": "start",
+            "size": "md",
+            "gravity": "center",
+            "margin": "lg",
+            "weight": "regular",
+            "wrap": True
+          }
+        ],
+        "backgroundColor": "#FF6B6E",
+        "paddingTop": "19px",
+        "paddingAll": "12px",
+        "paddingBottom": "25px",
+        "margin": "none"
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Introduction: ",
+                "color": "#8C8C8C",
+                "size": "sm",
+                "wrap": True
+              },
+              {
+                "type": "text",
+                "wrap": True,
+                "text": "幫助使用者自動改正錯字",
+                "margin": "sm",
+                "size": "xs"
+              },
+              {
+                "type": "text",
+                "text": "A spelling error correction machine for users intending to correct typos automatically in their articles.",
+                "wrap": True,
+                "size": "xs"
+              },
+              {
+                "type": "separator",
+                "margin": "sm"
+              },
+              {
+                "type": "text",
+                "text": "✔️ Correct + Show Typo: 改正錯字並顯示錯字的位置",
+                "wrap": True,
+                "size": "xxs",
+                "color": "#06293A",
+                "margin": "sm"
+              },
+              {
+                "type": "text",
+                "text": "✔️ Correct Only: 只自動改正錯字",
+                "color": "#06293A",
+                "wrap": True,
+                "size": "xxs"
+              }
+            ],
+            "flex": 1,
+            "height": "188px",
+            "margin": "xs"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "Correct + Show Typo",
+                    "action": {
+                      "type": "message",
+                      "label": "Correct and Show Typo",
+                      "text": "Correct and Show Typo"
+                    },
+                    "color": "#1093d4",
+                    "align": "center",
+                    "style": "normal",
+                    "offsetTop": "3px"
+                  }
+                ],
+                "borderColor": "#1093d4",
+                "borderWidth": "1px",
+                "cornerRadius": "5px",
+                "height": "30px",
+                "offsetTop": "3px"
+              },
+              {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "Correct Only",
+                    "action": {
+                      "type": "message",
+                      "label": "Correct Only",
+                      "text": "Correct Only"
+                    },
+                    "color": "#1093d4",
+                    "align": "center",
+                    "weight": "regular",
+                    "style": "normal",
+                    "offsetTop": "3px"
+                  }
+                ],
+                "height": "30px",
+                "borderWidth": "1px",
+                "borderColor": "#1093d4",
+                "cornerRadius": "5px",
+                "offsetTop": "13px"
+              }
+            ],
+            "height": "90px"
+          }
+        ],
+        "spacing": "md",
+        "paddingAll": "12px",
+        "height": "300px"
+      },
+      "styles": {
+        "footer": {
+          "separator": False
+        }
+      }
+    },
+    {
+      "type": "bubble",
+      "size": "kilo",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "文法小老師",
+            "color": "#ffffff",
+            "align": "start",
+            "size": "xl",
+            "gravity": "center",
+            "decoration": "none",
+            "weight": "bold"
+          },
+          {
+            "type": "text",
+            "text": "Grammar Tutor",
+            "color": "#ffffff",
+            "align": "start",
+            "size": "md",
+            "gravity": "center",
+            "margin": "lg",
+            "weight": "regular",
+            "wrap": True
+          }
+        ],
+        "backgroundColor": "#A17DF5",
+        "paddingTop": "19px",
+        "paddingAll": "12px",
+        "paddingBottom": "25px",
+        "margin": "none"
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Introduction:",
+                "color": "#8C8C8C",
+                "size": "sm",
+                "wrap": True
+              },
+              {
+                "type": "text",
+                "text": "幫助中文學習者改正短句的錯別字及文法",
+                "wrap": True,
+                "margin": "lg"
+              },
+              {
+                "type": "text",
+                "text": "A tool for Chinese learners to correct grammatical errors and typos, and learn the proper usage",
+                "wrap": True,
+                "margin": "lg"
+              }
+            ],
+            "flex": 1,
+            "height": "230px"
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Start",
+                "action": {
+                  "type": "message",
+                  "label": "Start",
+                  "text": "Start"
+                },
+                "color": "#1093d4",
+                "position": "relative",
+                "decoration": "none",
+                "style": "normal",
+                "weight": "regular",
+                "align": "center",
+                "offsetTop": "3px"
+              }
+            ],
+            "borderColor": "#1093d4",
+            "borderWidth": "1px",
+            "cornerRadius": "5px",
+            "height": "30px"
+          }
+        ],
+        "spacing": "md",
+        "paddingAll": "12px",
+        "height": "300px"
+      },
+      "styles": {
+        "footer": {
+          "separator": False
+        }
+      }
+    },
+    {
+      "type": "bubble",
+      "size": "kilo",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "近似詞推薦",
+            "color": "#ffffff",
+            "align": "start",
+            "size": "xl",
+            "gravity": "center",
+            "decoration": "none",
+            "weight": "bold"
+          },
+          {
+            "type": "text",
+            "text": "Synonym Guidance",
+            "color": "#ffffff",
+            "align": "start",
+            "size": "md",
+            "gravity": "center",
+            "margin": "lg",
+            "weight": "regular",
+            "wrap": True
+          }
+        ],
+        "backgroundColor": "#0367D3",
+        "paddingTop": "19px",
+        "paddingAll": "12px",
+        "paddingBottom": "25px",
+        "margin": "none"
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Introduction: ",
+                "color": "#8C8C8C",
+                "size": "sm",
+                "wrap": True
+              },
+              {
+                "type": "text",
+                "text": "幫助使用者尋找句子中詞語的相關替換字，添增文本的色彩",
+                "wrap": True,
+                "margin": "lg"
+              },
+              {
+                "type": "text",
+                "text": "A tool for users to look for synonyms in their articles.",
+                "margin": "lg",
+                "wrap": True
+              }
+            ],
+            "flex": 1,
+            "height": "230px"
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Recommend",
+                "action": {
+                  "type": "message",
+                  "label": "Recommend",
+                  "text": "Recommend"
+                },
+                "color": "#1093d4",
+                "position": "relative",
+                "decoration": "none",
+                "style": "normal",
+                "weight": "regular",
+                "align": "center",
+                "offsetTop": "3px"
+              }
+            ],
+            "borderColor": "#1093d4",
+            "borderWidth": "1px",
+            "cornerRadius": "5px",
+            "height": "30px"
+          }
+        ],
+        "spacing": "md",
+        "paddingAll": "12px",
+        "height": "300px"
+      },
+      "styles": {
+        "footer": {
+          "separator": False
+        }
+      }
+    }
+  ]
+}
