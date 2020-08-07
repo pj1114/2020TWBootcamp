@@ -48,25 +48,37 @@ def callback():
 @handler.add(MessageEvent, message = TextMessage)
 def handle_message(event):
   # Reply message to user
-  def reply(text):
-    line_bot_api.reply_message(event.reply_token, TextSendMessage(text = text))
+  def safe_reply_text(text_message):
+    try:
+      line_bot_api.reply_message(event.reply_token, TextSendMessage(text = text_message))
+      print("Send response with reply message")
+    except:
+      line_bot_api.push_message(event.source.user_id, TextSendMessage(text = text_message))
+      print("Send response with push message")
+  def safe_reply_flex(flex_message):
+    try:
+      line_bot_api.reply_message(event.reply_token, flex_message)
+      print("Send response with reply message")
+    except:
+      line_bot_api.push_message(event.source.user_id, flex_message)
+      print("Send response with push message")
   try:
     # Check if the state should be changed
     if(event.message.text == "***文本偵錯***"):
       handle_message.state = "spelling_error_detection"
-      reply("Spelling error detection service activated!")
+      safe_reply_text("Spelling error detection service activated!")
       return
     elif(event.message.text == "***文本修正***"):
       handle_message.state = "spelling_error_correction"
-      reply("Spelling error correction service activated!")
+      safe_reply_text("Spelling error correction service activated!")
       return
     elif(event.message.text == "***文法修正***"):
       handle_message.state = "grammar_error_correction"
-      reply("Grammar error correction service activated!")
+      safe_reply_text("Grammar error correction service activated!")
       return
     # Check the state to support different services
     if(handle_message.state == "init"):
-      reply("Please select a service from the rich menu first!")
+      safe_reply_text("Please select a service from the rich menu first!")
     elif(handle_message.state == "spelling_error_detection"):
       print("Handling spelling error detection with input: " + event.message.text)
       # Perform named-entity recognition first
@@ -101,7 +113,7 @@ def handle_message(event):
             spelling_error_detection_output_span["text"] = ner_processed_text[i]
             spelling_error_detection_output_spans.append(spelling_error_detection_output_span)
         spelling_error_detection_reply["body"]["contents"][9]["contents"] = spelling_error_detection_output_spans
-      line_bot_api.reply_message(event.reply_token, FlexSendMessage(alt_text = "文本偵錯結果", contents = spelling_error_detection_reply))
+      safe_reply_flex(FlexSendMessage(alt_text = "文本偵錯結果", contents = spelling_error_detection_reply))
     elif(handle_message.state == "spelling_error_correction"):
       print("Handling spelling error correction with input: " + event.message.text)
       # Perform named-entity recognition first
@@ -110,19 +122,19 @@ def handle_message(event):
       if(len(event.message.text) <= 8):
         result = ZLG.bertDetectAndCorrect(ner_processed_text, 3, ne_positions)[0]
         # Reply correction result to user
-        reply("Spelling error correction result: \n" + result)
+        safe_reply_text("Spelling error correction result: \n" + result)
       else:
         ne_positions = set(ne_positions)
         # Detect spelling errors
-        err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 5e-3, 3)
+        err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 1e-5, 3)
         err_positions = set(err_positions)
         # Correct spelling errors
-        result = ZLG.correctSpellingError(ner_processed_text, err_positions, bert_predictions, ne_positions, 1, 3)[0][0]
+        result = ZLG.correctSpellingError(ner_processed_text, err_positions, bert_predictions, ne_positions, 1, 10)[0][0]
         # Reply correction result to user
-        reply("Spelling error correction result: \n" + result)
+        safe_reply_text("Spelling error correction result: \n" + result)
     else:
       print("Handling grammar error correction with input: " + event.message.text)
-      reply("Sorry, grammar error correction service can't be supported now...")
+      safe_reply_text("Sorry, grammar error correction service can't be supported now...")
   except:
     traceback.print_exc()
 
