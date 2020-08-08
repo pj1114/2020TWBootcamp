@@ -366,3 +366,42 @@ class ZaiLaGan():
         corrected_text += punc[index]
     positions += list(ne_positions)
     return (corrected_text, list(set(positions)))
+
+  # Divide a long text into multiple parts and correct spelling errors separately
+  def divideAndCorrectSpellingError(self, text: str) -> Tuple[str, str]:
+    # Perform named-entity recognition first
+    ner_processed_text, ne_positions = self.detectNamedEntity([text], 'correction')[0]
+    ne_positions = set(ne_positions)
+    # Detect spelling errors
+    err_positions, bert_predictions = self.detectSpellingError(ner_processed_text, 1e-5, 3)
+    err_positions = set(err_positions)
+    # Split long text into multiple parts
+    punctuations = {"。", "?", "!", "，", "、", ";", ":"}
+    splitted_text = []
+    sub_ne_positions, sub_err_positions, sub_bert_predictions = set(), set(), {}
+    start = 0
+    count = 0
+    for i in range(len(ner_processed_text)):
+      # Check if current character is included in a named-entity or is an error
+      if(i in ne_positions):
+        sub_ne_positions.add(i-start)
+      if(i in err_positions):
+        sub_err_positions.add(i-start)
+        sub_bert_predictions[i-start] = bert_predictions[i]
+      # Check if current character is a punctuation
+      if(ner_processed_text[i] in punctuations):
+        count += 1
+      # Check if a short text has been completed
+      if(count == 2):
+        splitted_text.append((ner_processed_text[start:i+1], sub_err_positions, sub_bert_predictions, sub_ne_positions))
+        sub_ne_positions, sub_err_positions, sub_bert_predictions = set(), set(), {}
+        start = i + 1
+        count = 0
+      elif(i == len(ner_processed_text) - 1):
+        splitted_text.append((ner_processed_text[start:], sub_err_positions, sub_bert_predictions, sub_ne_positions))
+    # Correct spelling errors in each short text and combine corrected results
+    corrections = []
+    for short_text in splitted_text:
+      correction = self.correctSpellingError(short_text[0], short_text[1], short_text[2], short_text[3], 10, 1.5)[0][0]
+      corrections.append(correction)
+    return (ner_processed_text, "".join(corrections))

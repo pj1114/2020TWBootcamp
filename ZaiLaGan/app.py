@@ -125,19 +125,8 @@ def handle_message(event):
       safe_reply_flex(FlexSendMessage(alt_text = "文本偵錯結果", contents = spelling_error_detection_reply))
     elif(handle_message.state == "spelling_error_correction"):
       print("Handling spelling error correction with input: " + event.message.text)
-      # Perform named-entity recognition first
-      ner_processed_text, ne_positions = ZLG.detectNamedEntity([event.message.text], 'correction')[0]
-      result = ""
-      # Call different correctors according to length of input
-      if(len(event.message.text) <= 8):
-        result = ZLG.bertDetectAndCorrect(ner_processed_text, 3, ne_positions)[0]
-      else:
-        ne_positions = set(ne_positions)
-        # Detect spelling errors
-        err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 1e-5, 3)
-        err_positions = set(err_positions)
-        # Correct spelling errors
-        result = ZLG.correctSpellingError(ner_processed_text, err_positions, bert_predictions, ne_positions, 10, 2.5)[0][0]
+      # Correct spelling errors
+      ner_processed_text, result = ZLG.divideAndCorrectSpellingError(event.message.text)
       # Reply correction result to user
       spelling_error_correction_reply = spelling_error_correction_reply_template.copy()
       # Fill in input
