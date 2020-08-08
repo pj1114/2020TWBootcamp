@@ -378,13 +378,13 @@ carousel_menu = {
               },
               {
                 "type": "text",
-                "text": "幫助使用者於文本中自動偵測錯字，節省使用者大量的時間。",
+                "text": "幫助使用者於文本中自動偵測錯字，節省使用者大量的時間",
                 "wrap": True,
                 "margin": "lg"
               },
               {
                 "type": "text",
-                "text": "A spelling error detection machine for users intending to look for typos in their articles.",
+                "text": "A spelling error detection machine for users intending to look for typos in their articles",
                 "wrap": True,
                 "margin": "lg"
               }
@@ -444,7 +444,8 @@ carousel_menu = {
             "size": "xl",
             "gravity": "center",
             "decoration": "none",
-            "weight": "bold"
+            "weight": "bold",
+            "wrap": True
           },
           {
             "type": "text",
@@ -481,96 +482,45 @@ carousel_menu = {
               },
               {
                 "type": "text",
+                "text": "幫助使用者於文本中自動改正錯字，節省使用者大量的時間",
                 "wrap": True,
-                "text": "幫助使用者自動改正錯字",
-                "margin": "sm",
-                "size": "xs"
+                "margin": "lg"
               },
               {
                 "type": "text",
-                "text": "A spelling error correction machine for users intending to correct typos automatically in their articles.",
+                "text": "A spelling error correction machine for users intending to correct typos automatically in their articles",
                 "wrap": True,
-                "size": "xs"
-              },
-              {
-                "type": "separator",
-                "margin": "sm"
-              },
-              {
-                "type": "text",
-                "text": "✔️ Correct + Show Typo: 改正錯字並顯示錯字的位置",
-                "wrap": True,
-                "size": "xxs",
-                "color": "#06293A",
-                "margin": "sm"
-              },
-              {
-                "type": "text",
-                "text": "✔️ Correct Only: 只自動改正錯字",
-                "color": "#06293A",
-                "wrap": True,
-                "size": "xxs"
+                "margin": "lg"
               }
             ],
             "flex": 1,
-            "height": "187px",
-            "margin": "xs"
+            "height": "230px"
           },
           {
             "type": "box",
-            "layout": "vertical",
+            "layout": "baseline",
             "contents": [
               {
-                "type": "box",
-                "layout": "baseline",
-                "contents": [
-                  {
-                    "type": "text",
-                    "text": "Correct + Show Typo",
-                    "action": {
-                      "type": "message",
-                      "label": "Correct and Show Typo",
-                      "text": "***文本修正***"
-                    },
-                    "color": "#1093d4",
-                    "align": "center",
-                    "style": "normal",
-                    "offsetTop": "3px"
-                  }
-                ],
-                "borderColor": "#1093d4",
-                "borderWidth": "1px",
-                "cornerRadius": "5px",
-                "height": "30px",
+                "type": "text",
+                "text": "Correct",
+                "action": {
+                  "type": "message",
+                  "label": "Correct",
+                  "text": "***文本修正***"
+                },
+                "color": "#1093d4",
+                "position": "relative",
+                "decoration": "none",
+                "style": "normal",
+                "weight": "regular",
+                "align": "center",
                 "offsetTop": "3px"
-              },
-              {
-                "type": "box",
-                "layout": "baseline",
-                "contents": [
-                  {
-                    "type": "text",
-                    "text": "Correct Only",
-                    "action": {
-                      "type": "message",
-                      "label": "Correct Only",
-                      "text": "***文本修正***"
-                    },
-                    "color": "#1093d4",
-                    "align": "center",
-                    "weight": "regular",
-                    "style": "normal",
-                    "offsetTop": "3px"
-                  }
-                ],
-                "height": "30px",
-                "borderWidth": "1px",
-                "borderColor": "#1093d4",
-                "cornerRadius": "5px",
-                "offsetTop": "13px"
               }
             ],
-            "height": "90px"
+            "borderColor": "#1093d4",
+            "borderWidth": "1px",
+            "cornerRadius": "5px",
+            "height": "30px"
           }
         ],
         "spacing": "md",
@@ -598,7 +548,8 @@ carousel_menu = {
             "size": "xl",
             "gravity": "center",
             "decoration": "none",
-            "weight": "bold"
+            "weight": "bold",
+            "wrap": True
           },
           {
             "type": "text",
@@ -628,20 +579,20 @@ carousel_menu = {
             "contents": [
               {
                 "type": "text",
-                "text": "Introduction:",
+                "text": "Introduction: ",
                 "color": "#8C8C8C",
                 "size": "sm",
                 "wrap": True
               },
               {
                 "type": "text",
-                "text": "幫助中文學習者改正短句的錯別字及文法",
+                "text": "幫助中文學習者改正短句中的錯別字及文法，增進學習效率",
                 "wrap": True,
                 "margin": "lg"
               },
               {
                 "type": "text",
-                "text": "A tool for Chinese learners to correct grammatical errors and typos, and learn the proper usage",
+                "text": "A tool for Chinese learners to correct grammatical errors and typos to help them learn the proper usages",
                 "wrap": True,
                 "margin": "lg"
               }
@@ -701,11 +652,12 @@ carousel_menu = {
             "size": "xl",
             "gravity": "center",
             "decoration": "none",
-            "weight": "bold"
+            "weight": "bold",
+            "wrap": True
           },
           {
             "type": "text",
-            "text": "Synonym Guidance",
+            "text": "Synonym Recommendation",
             "color": "#ffffff",
             "align": "start",
             "size": "md",
@@ -738,15 +690,15 @@ carousel_menu = {
               },
               {
                 "type": "text",
-                "text": "幫助使用者尋找句子中詞語的相關替換字，添增文本的色彩",
+                "text": "幫助使用者尋找文本中詞語的近似替換詞，增添文本的色彩",
                 "wrap": True,
                 "margin": "lg"
               },
               {
                 "type": "text",
-                "text": "A tool for users to look for synonyms in their articles.",
-                "margin": "lg",
-                "wrap": True
+                "text": "A tool for users to look for synonyms to substitute for repetitive words in their articles",
+                "wrap": True,
+                "margin": "lg"
               }
             ],
             "flex": 1,
