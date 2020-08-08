@@ -6,7 +6,7 @@ import yaml
 from zailagan import ZaiLaGan
 import os
 import traceback
-from utilities.utils import spelling_error_detection_reply_template, spelling_error_detection_output_span_template, spelling_error_detection_output_error_span_template
+from utilities.utils import spelling_error_detection_reply_template, spelling_error_detection_output_span_template, spelling_error_detection_output_error_span_template, carousel_menu
 
 # Initialize application
 app = Flask(__name__)
@@ -63,6 +63,11 @@ def handle_message(event):
       line_bot_api.push_message(event.source.user_id, flex_message)
       print("Send response with push message")
   try:
+    # Check if the carousel menu should be returned
+    if(event.message.text.lower() == "zlg"):
+      handle_message.state = "init"
+      safe_reply_flex(FlexSendMessage(alt_text = "功能選單", contents = carousel_menu))
+      return
     # Check if the state should be changed
     if(event.message.text == "***文本偵錯***"):
       handle_message.state = "spelling_error_detection"
@@ -75,6 +80,10 @@ def handle_message(event):
     elif(event.message.text == "***文法修正***"):
       handle_message.state = "grammar_error_correction"
       safe_reply_text("Grammar error correction service activated!")
+      return
+    elif(event.message.text == "***近似詞推薦***"):
+      handle_message.state = "synonym_recommendation"
+      safe_reply_text("Synonym recommendation service activated!")
       return
     # Check the state to support different services
     if(handle_message.state == "init"):
@@ -129,12 +138,15 @@ def handle_message(event):
         err_positions, bert_predictions = ZLG.detectSpellingError(ner_processed_text, 1e-5, 3)
         err_positions = set(err_positions)
         # Correct spelling errors
-        result = ZLG.correctSpellingError(ner_processed_text, err_positions, bert_predictions, ne_positions, 1, 10)[0][0]
+        result = ZLG.correctSpellingError(ner_processed_text, err_positions, bert_predictions, ne_positions, 10, 2.5)[0][0]
         # Reply correction result to user
         safe_reply_text("Spelling error correction result: \n" + result)
-    else:
+    elif(handle_message.state == "grammar_error_correction"):
       print("Handling grammar error correction with input: " + event.message.text)
       safe_reply_text("Sorry, grammar error correction service can't be supported now...")
+    else:
+      print("Handling synonym recommendation with input: " + event.message.text)
+      safe_reply_text("Sorry, synonym recommendation service can't be supported now...")
   except:
     traceback.print_exc()
 

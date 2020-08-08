@@ -292,7 +292,7 @@ carousel_menu = {
                 "action": {
                   "type": "message",
                   "label": "Detect",
-                  "text": "Detect"
+                  "text": "***文本偵錯***"
                 },
                 "color": "#1093d4",
                 "position": "relative",
@@ -403,7 +403,7 @@ carousel_menu = {
               }
             ],
             "flex": 1,
-            "height": "188px",
+            "height": "187px",
             "margin": "xs"
           },
           {
@@ -420,7 +420,7 @@ carousel_menu = {
                     "action": {
                       "type": "message",
                       "label": "Correct and Show Typo",
-                      "text": "Correct and Show Typo"
+                      "text": "***文本修正***"
                     },
                     "color": "#1093d4",
                     "align": "center",
@@ -444,7 +444,7 @@ carousel_menu = {
                     "action": {
                       "type": "message",
                       "label": "Correct Only",
-                      "text": "Correct Only"
+                      "text": "***文本修正***"
                     },
                     "color": "#1093d4",
                     "align": "center",
@@ -549,7 +549,7 @@ carousel_menu = {
                 "action": {
                   "type": "message",
                   "label": "Start",
-                  "text": "Start"
+                  "text": "***文法修正***"
                 },
                 "color": "#1093d4",
                 "position": "relative",
@@ -652,7 +652,7 @@ carousel_menu = {
                 "action": {
                   "type": "message",
                   "label": "Recommend",
-                  "text": "Recommend"
+                  "text": "***近似詞推薦***"
                 },
                 "color": "#1093d4",
                 "position": "relative",
