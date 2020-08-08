@@ -6,7 +6,7 @@ import yaml
 from zailagan import ZaiLaGan
 import os
 import traceback
-from utilities.utils import spelling_error_detection_reply_template, spelling_error_detection_output_span_template, spelling_error_detection_output_error_span_template, carousel_menu
+from utilities.utils import *
 
 # Initialize application
 app = Flask(__name__)
@@ -127,11 +127,10 @@ def handle_message(event):
       print("Handling spelling error correction with input: " + event.message.text)
       # Perform named-entity recognition first
       ner_processed_text, ne_positions = ZLG.detectNamedEntity([event.message.text], 'correction')[0]
+      result = ""
       # Call different correctors according to length of input
       if(len(event.message.text) <= 8):
         result = ZLG.bertDetectAndCorrect(ner_processed_text, 3, ne_positions)[0]
-        # Reply correction result to user
-        safe_reply_text("Spelling error correction result: \n" + result)
       else:
         ne_positions = set(ne_positions)
         # Detect spelling errors
@@ -139,8 +138,26 @@ def handle_message(event):
         err_positions = set(err_positions)
         # Correct spelling errors
         result = ZLG.correctSpellingError(ner_processed_text, err_positions, bert_predictions, ne_positions, 10, 2.5)[0][0]
-        # Reply correction result to user
-        safe_reply_text("Spelling error correction result: \n" + result)
+      # Reply correction result to user
+      spelling_error_correction_reply = spelling_error_correction_reply_template.copy()
+      # Fill in input
+      spelling_error_correction_reply["body"]["contents"][5]["text"] = event.message.text
+      # Fill in output
+      spelling_error_correction_output_spans = []
+      for i in range(len(ner_processed_text)):
+        if(ner_processed_text[i] == result[i]):
+          spelling_error_correction_output_span = spelling_error_correction_output_span_template.copy()
+          spelling_error_correction_output_span["text"] = ner_processed_text[i]
+          spelling_error_correction_output_spans.append(spelling_error_correction_output_span)
+        else:
+          spelling_error_correction_output_typo_span = spelling_error_correction_output_typo_span_template.copy()
+          spelling_error_correction_output_typo_span["text"] = ner_processed_text[i]
+          spelling_error_correction_output_spans.append(spelling_error_correction_output_typo_span)
+          spelling_error_correction_output_correction_span = spelling_error_correction_output_correction_span_template.copy()
+          spelling_error_correction_output_correction_span["text"] = result[i]
+          spelling_error_correction_output_spans.append(spelling_error_correction_output_correction_span)
+      spelling_error_correction_reply["body"]["contents"][9]["contents"] = spelling_error_correction_output_spans
+      safe_reply_flex(FlexSendMessage(alt_text = "文本修正結果", contents = spelling_error_correction_reply))
     elif(handle_message.state == "grammar_error_correction"):
       print("Handling grammar error correction with input: " + event.message.text)
       safe_reply_text("Sorry, grammar error correction service can't be supported now...")
