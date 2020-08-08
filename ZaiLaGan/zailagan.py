@@ -30,7 +30,7 @@ class ZaiLaGan():
     self.charSet = self.utils.loadCharSet(self.config['Data']['common_char_set'])
     self.customConfusionDict = self.utils.loadCustomConfusion(self.config['Data']['confusion'])
     self.ngram_model = NGRAM(self.config["Model"]["ngram"])
-    #self.wordSub_model = wordSub(self.config["Model"]["ws_model"], self.config["Model"]["pos_model"], self.config["Model"]["w2v_model"])
+    self.wordSub_model = wordSub(self.config["Model"]["ws_model"], self.config["Model"]["pos_model"], self.config["Model"]["w2v_model"], self.config["Data"]["anti_dict"])
 
   # Detect named-entities and return their corrections & positions
   def detectNamedEntity(self, sentences: List[str], task_name:str) -> List[Tuple[str,List[int]]]:
@@ -198,40 +198,8 @@ class ZaiLaGan():
     # character-based detection and correction
     for (short_text, start_idx) in short_texts:
       for idx, single_word in enumerate(short_text):
-        if start_idx+idx not in ner_pos_list:
-          # bert-based model generates topk candidates 
-          masked_text = "[CLS]" + text[:idx] + "[MASK]" + text[idx+1:] + "[SEP]"
-          tokenized_masked_text = self.bert_base_tokenizer.tokenize(masked_text)
-          token_ids = torch.tensor([self.bert_base_tokenizer.convert_tokens_to_ids(tokenized_masked_text)])
-          segment_ids = torch.tensor([[0] * token_ids.shape[1]])
-          token_ids = token_ids.to(self.device)
-          segment_ids = segment_ids.to(self.device)
-          with torch.no_grad():
-            outputs = self.bert_base_model(token_ids, token_type_ids = segment_ids)
-            scores = outputs[0][0,idx+1]
-            token_probability = torch.nn.Softmax(0)(scores)[self.bert_base_tokenizer.convert_tokens_to_ids(text[idx])]
-            scores_list = torch.nn.Softmax(0)(scores)
-            _, pred = scores_list.topk(topk, 0, True, True)
-            topk_bert_candidates = [self.bert_base_tokenizer.convert_ids_to_tokens(ele.item()) for ele in pred]
-              
-          if topk_bert_candidates and (single_word not in topk_bert_candidates):
-            candidates = self.generate_correction_cand(short_text[idx])
-            candidates_sorted = sorted(candidates, key=lambda k: self.dict_trie.getWordFreq(k), reverse=True)
-            if candidates_sorted:
-              for topk_bert_cand in topk_bert_candidates:
-                if topk_bert_cand in candidates_sorted:
-                  #print(['- '+single_word, '+ '+topk_bert_cand + '_'+str(start_idx+idx)])
-                  text_list[start_idx+idx] = topk_bert_cand
-                  positions.append(start_idx+idx)
-                  single_word = topk_bert_cand
-                  break
-                            
-    # word-based detection and correction
-    for (short_text, start_idx) in short_texts:
-      for n in [2, 3, 4, 5]:
-        for idx in range(len(short_text) - n + 1):
-          if not ner_pos_list or (ner_pos_list and (start_idx+idx > ner_pos_list[-1] or start_idx+idx+n < ner_pos_list[0])):
-            word = short_text[idx: idx+n]
+        if self.utils.isChineseChar(single_word):
+          if start_idx+idx not in ner_pos_list:
             # bert-based model generates topk candidates 
             masked_text = "[CLS]" + text[:idx] + "[MASK]" + text[idx+1:] + "[SEP]"
             tokenized_masked_text = self.bert_base_tokenizer.tokenize(masked_text)
@@ -246,17 +214,51 @@ class ZaiLaGan():
               scores_list = torch.nn.Softmax(0)(scores)
               _, pred = scores_list.topk(topk, 0, True, True)
               topk_bert_candidates = [self.bert_base_tokenizer.convert_ids_to_tokens(ele.item()) for ele in pred]
-            
-            candidates = self.generate_correction_cand(word)
-            candidates = [ele for ele in candidates if self.dict_trie.getWordFreq(ele)>0]
-            if candidates:
-              for topk_bert_cand in topk_bert_candidates:
-                tmp_word = topk_bert_cand + word[1:]
-                if tmp_word in candidates and tmp_word!= word:
-                  #print(['- '+short_text[idx], '+ '+topk_bert_cand + '_'+str(start_idx+idx)])
-                  text_list[start_idx+idx] = topk_bert_cand
-                  positions.append(start_idx+idx)
-                  break
+                
+            if topk_bert_candidates and (single_word not in topk_bert_candidates):
+              candidates = self.generate_correction_cand(short_text[idx])
+              candidates_sorted = sorted(candidates, key=lambda k: self.dict_trie.getWordFreq(k), reverse=True)
+              if candidates_sorted:
+                for topk_bert_cand in topk_bert_candidates:
+                  if topk_bert_cand in candidates_sorted:
+                    #print(['- '+single_word, '+ '+topk_bert_cand + '_'+str(start_idx+idx)])
+                    text_list[start_idx+idx] = topk_bert_cand
+                    positions.append(start_idx+idx)
+                    single_word = topk_bert_cand
+                    break
+                            
+    # word-based detection and correction
+    for (short_text, start_idx) in short_texts:
+      for n in [2, 3, 4, 5]:
+        for idx in range(len(short_text) - n + 1):
+          if not ner_pos_list or (ner_pos_list and (start_idx+idx > ner_pos_list[-1] or start_idx+idx+n < ner_pos_list[0])):
+            if self.utils.isChineseChar(short_text[idx]):
+              word = short_text[idx: idx+n]
+              # bert-based model generates topk candidates 
+              masked_text = "[CLS]" + text[:idx] + "[MASK]" + text[idx+1:] + "[SEP]"
+              tokenized_masked_text = self.bert_base_tokenizer.tokenize(masked_text)
+              token_ids = torch.tensor([self.bert_base_tokenizer.convert_tokens_to_ids(tokenized_masked_text)])
+              segment_ids = torch.tensor([[0] * token_ids.shape[1]])
+              token_ids = token_ids.to(self.device)
+              segment_ids = segment_ids.to(self.device)
+              with torch.no_grad():
+                outputs = self.bert_base_model(token_ids, token_type_ids = segment_ids)
+                scores = outputs[0][0,idx+1]
+                token_probability = torch.nn.Softmax(0)(scores)[self.bert_base_tokenizer.convert_tokens_to_ids(text[idx])]
+                scores_list = torch.nn.Softmax(0)(scores)
+                _, pred = scores_list.topk(topk, 0, True, True)
+                topk_bert_candidates = [self.bert_base_tokenizer.convert_ids_to_tokens(ele.item()) for ele in pred]
+              
+              candidates = self.generate_correction_cand(word)
+              candidates = [ele for ele in candidates if self.dict_trie.getWordFreq(ele)>0]
+              if candidates:
+                for topk_bert_cand in topk_bert_candidates:
+                  tmp_word = topk_bert_cand + word[1:]
+                  if tmp_word in candidates and tmp_word!= word:
+                    #print(['- '+short_text[idx], '+ '+topk_bert_cand + '_'+str(start_idx+idx)])
+                    text_list[start_idx+idx] = topk_bert_cand
+                    positions.append(start_idx+idx)
+                    break
     # return corrected string and error position list
     return (''.join(text_list), sorted(list(set(positions))) )
 
@@ -264,38 +266,8 @@ class ZaiLaGan():
     positions = []
     text_list = list(text)
     for idx, single_word in enumerate(text):
-      if idx not in ner_pos_list:
-        # bert-based model generates topk candidates 
-        masked_text = "[CLS]" + text[:idx] + "[MASK]" + text[idx+1:] + "[SEP]"
-        tokenized_masked_text = self.bert_base_tokenizer.tokenize(masked_text)
-        token_ids = torch.tensor([self.bert_base_tokenizer.convert_tokens_to_ids(tokenized_masked_text)])
-        segment_ids = torch.tensor([[0] * token_ids.shape[1]])
-        token_ids = token_ids.to(self.device)
-        segment_ids = segment_ids.to(self.device)
-        with torch.no_grad():
-          outputs = self.bert_base_model(token_ids, token_type_ids = segment_ids)
-          scores = outputs[0][0,idx+1]
-          token_probability = torch.nn.Softmax(0)(scores)[self.bert_base_tokenizer.convert_tokens_to_ids(text[idx])]
-          scores_list = torch.nn.Softmax(0)(scores)
-          _, pred = scores_list.topk(topk, 0, True, True)
-          topk_bert_candidates = [self.bert_base_tokenizer.convert_ids_to_tokens(ele.item()) for ele in pred]
-
-        if topk_bert_candidates and (single_word not in topk_bert_candidates):
-          candidates = self.generate_correction_cand(text[idx])
-          candidates_sorted = sorted(candidates, key=lambda k: self.dict_trie.getWordFreq(k), reverse=True)
-          if candidates_sorted:
-            for topk_bert_cand in topk_bert_candidates:
-              if topk_bert_cand in candidates_sorted:
-                #print(['- '+single_word, '+ '+topk_bert_cand + '_'+str(start_idx+idx)])
-                text_list[idx] = topk_bert_cand
-                positions.append(idx)
-                single_word = topk_bert_cand
-                break
-                    
-    for n in [2, 3, 4, 5]:
-      for idx in range(len(text) - n + 1):
-        if not ner_pos_list or (ner_pos_list and (idx > ner_pos_list[-1] or idx+n < ner_pos_list[0])):
-          word = text[idx: idx+n]
+      if self.utils.isChineseChar(single_word):
+        if idx not in ner_pos_list:
           # bert-based model generates topk candidates 
           masked_text = "[CLS]" + text[:idx] + "[MASK]" + text[idx+1:] + "[SEP]"
           tokenized_masked_text = self.bert_base_tokenizer.tokenize(masked_text)
@@ -311,16 +283,48 @@ class ZaiLaGan():
             _, pred = scores_list.topk(topk, 0, True, True)
             topk_bert_candidates = [self.bert_base_tokenizer.convert_ids_to_tokens(ele.item()) for ele in pred]
 
-          candidates = self.generate_correction_cand(word)
-          candidates = [ele for ele in candidates if self.dict_trie.getWordFreq(ele)>0]
-          if candidates:
-            for topk_bert_cand in topk_bert_candidates:
-              tmp_word = topk_bert_cand + word[1:]
-              if tmp_word in candidates and tmp_word!= word:
-                #print(['- '+short_text[idx], '+ '+topk_bert_cand + '_'+str(start_idx+idx)])
-                text_list[idx] = topk_bert_cand
-                positions.append(idx)
-                break
+          if topk_bert_candidates and (single_word not in topk_bert_candidates):
+            candidates = self.generate_correction_cand(text[idx])
+            candidates_sorted = sorted(candidates, key=lambda k: self.dict_trie.getWordFreq(k), reverse=True)
+            if candidates_sorted:
+              for topk_bert_cand in topk_bert_candidates:
+                if topk_bert_cand in candidates_sorted:
+                  #print(['- '+single_word, '+ '+topk_bert_cand + '_'+str(start_idx+idx)])
+                  text_list[idx] = topk_bert_cand
+                  positions.append(idx)
+                  single_word = topk_bert_cand
+                  break
+                    
+    for n in [2, 3, 4, 5]:
+      for idx in range(len(text) - n + 1):
+        if not ner_pos_list or (ner_pos_list and (idx > ner_pos_list[-1] or idx+n < ner_pos_list[0])):
+          if self.utils.isChineseChar(text[idx]):
+            word = text[idx: idx+n]
+            # bert-based model generates topk candidates 
+            masked_text = "[CLS]" + text[:idx] + "[MASK]" + text[idx+1:] + "[SEP]"
+            tokenized_masked_text = self.bert_base_tokenizer.tokenize(masked_text)
+            token_ids = torch.tensor([self.bert_base_tokenizer.convert_tokens_to_ids(tokenized_masked_text)])
+            segment_ids = torch.tensor([[0] * token_ids.shape[1]])
+            token_ids = token_ids.to(self.device)
+            segment_ids = segment_ids.to(self.device)
+            with torch.no_grad():
+              outputs = self.bert_base_model(token_ids, token_type_ids = segment_ids)
+              scores = outputs[0][0,idx+1]
+              token_probability = torch.nn.Softmax(0)(scores)[self.bert_base_tokenizer.convert_tokens_to_ids(text[idx])]
+              scores_list = torch.nn.Softmax(0)(scores)
+              _, pred = scores_list.topk(topk, 0, True, True)
+              topk_bert_candidates = [self.bert_base_tokenizer.convert_ids_to_tokens(ele.item()) for ele in pred]
+
+            candidates = self.generate_correction_cand(word)
+            candidates = [ele for ele in candidates if self.dict_trie.getWordFreq(ele)>0]
+            if candidates:
+              for topk_bert_cand in topk_bert_candidates:
+                tmp_word = topk_bert_cand + word[1:]
+                if tmp_word in candidates and tmp_word!= word:
+                  #print(['- '+short_text[idx], '+ '+topk_bert_cand + '_'+str(start_idx+idx)])
+                  text_list[idx] = topk_bert_cand
+                  positions.append(idx)
+                  break
     return (''.join(text_list), sorted(list(set(positions))) )
 
   def contextErrDetectAndCorrect(self, text: str) -> Tuple[str, List[int]]:

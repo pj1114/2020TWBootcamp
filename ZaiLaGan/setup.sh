@@ -19,3 +19,5 @@ pip3 install re --upgrade
 pip3 install knlm --upgrade
 pip3 install ckiptagger --upgrade
 pip3 install gensim --upgrade
+pip3 install opencc --upgrade
+pip3 install nltk --upgrade
