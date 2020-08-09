@@ -209,7 +209,7 @@ class NER():
             del truth
         # end = time.time()
         #print("NER time: %.2f" % (end-start))
-        return all_truth
+        return all_truth, answer
     
     def check_ner(self, sentence, task_name='correction'):
         sentence = [re.sub(r'[\x00-\x19\x7E-\xFF\u3000\xa0\t]', '',i) for i in sentence]
@@ -220,7 +220,8 @@ class NER():
                 tmp = []
                 new_sentence = sentence[idx]
                 cumlen = 0
-                for j in i:
+                ner_pos={}
+                for jdx, j in enumerate(i):
                     if j[2]+1==j[3]:
                         continue
                     else:
@@ -229,10 +230,12 @@ class NER():
                         if len(j[0])>j[3]-j[2]:
                             new_len = len(j[0])-(j[3]-j[2])
                             tmp.extend(list(range(j[2]+cumlen, j[3]+cumlen+new_len)))
+                            ner_pos[(j[2]+cumlen, j[3]+cumlen+new_len-1)] = answer[idx][jdx][0]
                             cumlen+=new_len
                         else:
                             tmp.extend(list(range(j[2]+cumlen, j[3]+cumlen)))
-                all_data.append((new_sentence, tmp))
+                            ner_pos[(j[2]+cumlen, j[3]+cumlen-1)] = answer[idx][jdx][0]
+                all_data.append((new_sentence, tmp, ner_pos))
         elif task_name=='detection':
             for idx, i in enumerate(all_truth):
                 tmp_pos=[]
@@ -244,5 +247,4 @@ class NER():
                     tmp.extend(list(range(j[2], j[3])))
                 all_data.append((new_sentence, tmp, tmp_pos))
         return all_data
-
 
