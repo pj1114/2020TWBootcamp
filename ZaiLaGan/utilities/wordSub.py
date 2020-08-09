@@ -51,7 +51,8 @@ class wordSub():
 		pos_sentence_list = self.pos(word_sentence_list)[0]
 		word_sentence_list = word_sentence_list[0]
 
-		results = []
+		start_idx = 0
+		res_dict = dict()
 
 		for idx, word in enumerate(word_sentence_list):
 			if 'V' in pos_sentence_list[idx]:
@@ -80,6 +81,8 @@ class wordSub():
 				new_candidates = [(i[0],(cand_score_dict[i[0]]-min_score)/(max_score-min_score)) for i in sorted_candidates
 									if 0.0< (cand_score_dict[i[0]]-min_score)/(max_score-min_score) < 0.5]
 
-				results.append((word, new_candidates))
+				if len(new_candidates)>0:
+					res_dict[start_idx] = (word, new_candidates)
+			start_idx += len(word)
 
-		return results 
+		return res_dict 
