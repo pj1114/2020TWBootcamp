@@ -230,11 +230,10 @@ class NER():
                         if len(j[0])>j[3]-j[2]:
                             new_len = len(j[0])-(j[3]-j[2])
                             tmp.extend(list(range(j[2]+cumlen, j[3]+cumlen+new_len)))
-                            ner_pos[(j[2]+cumlen, j[3]+cumlen+new_len-1)] = answer[idx][jdx][0]
                             cumlen+=new_len
                         else:
                             tmp.extend(list(range(j[2]+cumlen, j[3]+cumlen)))
-                            ner_pos[(j[2]+cumlen, j[3]+cumlen-1)] = answer[idx][jdx][0]
+                        ner_pos[j[2]+cumlen] = answer[idx][jdx][0]
                 all_data.append((new_sentence, tmp, ner_pos))
         elif task_name=='detection':
             for idx, i in enumerate(all_truth):
