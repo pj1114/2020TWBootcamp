@@ -22,7 +22,7 @@ handler = WebhookHandler(config["Linebot"]["secret"])
 # Concatenate root path with all subpaths
 root_path = config["User"]["user_path"]
 model_names = ["gpt2_chinese", "ner", "ngram", "w2v_model", "ws_model", "pos_model"]
-data_names = ["pinyin", "stroke", "dictionary", "common_char_set", "confusion", "place", "person", "ssc"]
+data_names = ["pinyin", "stroke", "dictionary", "common_char_set", "confusion", "place", "person", "ssc", "anti_dict", "label_map"]
 for model_name in model_names:
     config["Model"][model_name] = os.path.join(root_path, config["Model"][model_name])
 for data_name in data_names:
