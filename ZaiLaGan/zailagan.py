@@ -6,6 +6,7 @@ from utilities.ner import *
 import re
 from pypinyin import lazy_pinyin
 from utilities.ngram import *
+from utilities.wordSub import *
 
 class ZaiLaGan():
   # Initialize config, device, model, tokenizer, and utilities

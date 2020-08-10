@@ -30,6 +30,7 @@ for data_name in data_names:
 
 # Instantiate ZaiLaGan
 ZLG = ZaiLaGan(config)
+print(ZLG.wordSub_model.get_word_subs("我想要吃好吃的漢堡"))
 
 # Handle incoming requests
 @app.route("/callback", methods = ["POST"])
