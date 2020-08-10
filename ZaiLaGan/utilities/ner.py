@@ -214,7 +214,7 @@ class NER():
     def check_ner(self, sentence, task_name='correction'):
         sentence = [re.sub(r'[\x00-\x19\x7E-\xFF\u3000\xa0\t]', '',i) for i in sentence]
         all_data = []
-        all_truth = self.check_name(sentence)
+        all_truth, answer = self.check_name(sentence)
         if task_name=='correction':
             for idx, i in enumerate(all_truth):
                 tmp = []
