@@ -22,3 +22,4 @@ Data:
   person: data/ner/person.txt 
   ssc: data/ner/sound_shape_code
   anti_dict: data/antisem.txt
+  label_map: data/label_map.txt.log
