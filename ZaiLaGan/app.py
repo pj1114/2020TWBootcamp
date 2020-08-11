@@ -152,7 +152,34 @@ def handle_message(event):
       safe_reply_text("Sorry, grammar error correction service can't be supported now...")
     else:
       print("Handling synonym recommendation with input: " + event.message.text)
-      safe_reply_text("Sorry, synonym recommendation service can't be supported now...")
+      # Get word substitutions
+      word_substitutions = ZLG.getWordSub(event.message.text)
+      # Reply synonym recommendation result to users
+      synonym_recommendation_reply = synonym_recommendation_reply_template.copy()
+      # Fill in input
+      synonym_recommendation_reply["body"]["contents"][5]["text"] = event.message.text
+      # Fill in output
+      synonym_recommendation_output_spans = []
+      idx = 0
+      while(idx < len(event.message.text)):
+        if(idx in word_substitutions):
+          synonym_recommendation_output_original_span = synonym_recommendation_output_original_span_template.copy()
+          synonym_recommendation_output_original_span["text"] = word_substitutions[idx][0]
+          synonym_recommendation_output_spans.append(synonym_recommendation_output_original_span)
+          synonyms = []
+          for synonym in word_substitutions[idx][1][:2]:
+            synonyms.append(synonym[0])
+          synonym_recommendation_output_recommendation_span = synonym_recommendation_output_recommendation_span_template.copy()
+          synonym_recommendation_output_recommendation_span["text"] = "(" + "/".join(synonyms) + ")"
+          synonym_recommendation_output_spans.append(synonym_recommendation_output_recommendation_span)
+          idx += len(word_substitutions[idx][0])
+        else:
+          synonym_recommendation_output_span = synonym_recommendation_output_span_template.copy()
+          synonym_recommendation_output_span["text"] = event.message.text[idx]
+          synonym_recommendation_output_spans.append(synonym_recommendation_output_span)
+          idx += 1
+      synonym_recommendation_reply["body"]["contents"][9]["contents"] = synonym_recommendation_output_spans
+      safe_reply_flex(FlexSendMessage(alt_text = "Synonym recommendation result", contents = synonym_recommendation_reply))
   except:
     traceback.print_exc()
 
