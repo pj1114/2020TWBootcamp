@@ -30,7 +30,6 @@ for data_name in data_names:
 
 # Instantiate ZaiLaGan
 ZLG = ZaiLaGan(config)
-print(ZLG.wordSub_model.get_word_subs("我想要吃好吃的漢堡"))
 
 # Handle incoming requests
 @app.route("/callback", methods = ["POST"])
@@ -67,22 +66,22 @@ def handle_message(event):
     # Check if the carousel menu should be returned
     if(event.message.text.lower() == "zlg"):
       handle_message.state = "init"
-      safe_reply_flex(FlexSendMessage(alt_text = "功能選單", contents = carousel_menu))
+      safe_reply_flex(FlexSendMessage(alt_text = "Menu", contents = carousel_menu))
       return
     # Check if the state should be changed
-    if(event.message.text == "***文本偵錯***"):
+    if(event.message.text == "***SpellingErrorDetection***"):
       handle_message.state = "spelling_error_detection"
       safe_reply_text("Spelling error detection service activated!")
       return
-    elif(event.message.text == "***文本修正***"):
+    elif(event.message.text == "***SpellingErrorCorrection***"):
       handle_message.state = "spelling_error_correction"
       safe_reply_text("Spelling error correction service activated!")
       return
-    elif(event.message.text == "***文法修正***"):
+    elif(event.message.text == "***GrammarErrorCorrection***"):
       handle_message.state = "grammar_error_correction"
       safe_reply_text("Grammar error correction service activated!")
       return
-    elif(event.message.text == "***近似詞推薦***"):
+    elif(event.message.text == "***SynonymRecommendation***"):
       handle_message.state = "synonym_recommendation"
       safe_reply_text("Synonym recommendation service activated!")
       return
@@ -123,7 +122,7 @@ def handle_message(event):
             spelling_error_detection_output_span["text"] = ner_processed_text[i]
             spelling_error_detection_output_spans.append(spelling_error_detection_output_span)
         spelling_error_detection_reply["body"]["contents"][9]["contents"] = spelling_error_detection_output_spans
-      safe_reply_flex(FlexSendMessage(alt_text = "文本偵錯結果", contents = spelling_error_detection_reply))
+      safe_reply_flex(FlexSendMessage(alt_text = "Spelling error detection result", contents = spelling_error_detection_reply))
     elif(handle_message.state == "spelling_error_correction"):
       print("Handling spelling error correction with input: " + event.message.text)
       # Correct spelling errors
@@ -147,7 +146,7 @@ def handle_message(event):
           spelling_error_correction_output_correction_span["text"] = result[i]
           spelling_error_correction_output_spans.append(spelling_error_correction_output_correction_span)
       spelling_error_correction_reply["body"]["contents"][9]["contents"] = spelling_error_correction_output_spans
-      safe_reply_flex(FlexSendMessage(alt_text = "文本修正結果", contents = spelling_error_correction_reply))
+      safe_reply_flex(FlexSendMessage(alt_text = "Spelling error correction result", contents = spelling_error_correction_reply))
     elif(handle_message.state == "grammar_error_correction"):
       print("Handling grammar error correction with input: " + event.message.text)
       safe_reply_text("Sorry, grammar error correction service can't be supported now...")

@@ -402,7 +402,7 @@ carousel_menu = {
                 "action": {
                   "type": "message",
                   "label": "Detect",
-                  "text": "***文本偵錯***"
+                  "text": "***SpellingErrorDetection***"
                 },
                 "color": "#1093d4",
                 "position": "relative",
@@ -506,7 +506,7 @@ carousel_menu = {
                 "action": {
                   "type": "message",
                   "label": "Correct",
-                  "text": "***文本修正***"
+                  "text": "***SpellingErrorCorrection***"
                 },
                 "color": "#1093d4",
                 "position": "relative",
@@ -610,7 +610,7 @@ carousel_menu = {
                 "action": {
                   "type": "message",
                   "label": "Start",
-                  "text": "***文法修正***"
+                  "text": "***GrammarErrorCorrection***"
                 },
                 "color": "#1093d4",
                 "position": "relative",
@@ -714,7 +714,7 @@ carousel_menu = {
                 "action": {
                   "type": "message",
                   "label": "Recommend",
-                  "text": "***近似詞推薦***"
+                  "text": "***SynonymRecommendation***"
                 },
                 "color": "#1093d4",
                 "position": "relative",

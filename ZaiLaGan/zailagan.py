@@ -6,7 +6,6 @@ from utilities.ner import *
 import re
 from pypinyin import lazy_pinyin
 from utilities.ngram import *
-from utilities.wordSub import *
 
 class ZaiLaGan():
   # Initialize config, device, model, tokenizer, and utilities
@@ -31,7 +30,6 @@ class ZaiLaGan():
     self.charSet = self.utils.loadCharSet(self.config['Data']['common_char_set'])
     self.customConfusionDict = self.utils.loadCustomConfusion(self.config['Data']['confusion'])
     self.ngram_model = NGRAM(self.config["Model"]["ngram"])
-    self.wordSub_model = wordSub(self.config["Model"]["ws_model"], self.config["Model"]["pos_model"], self.config["Model"]["w2v_model"], self.config["Data"]["anti_dict"])
     #self.GEC = grammarErrorCorrector(self.config["Data"]["label_map"], self.config["Model"]["ngram"], self.config["Model"]["pos_model"])
 
   # Detect named-entities and return their corrections & positions
@@ -372,7 +370,7 @@ class ZaiLaGan():
   # Divide a long text into multiple parts and correct spelling errors separately
   def divideAndCorrectSpellingError(self, text: str) -> Tuple[str, str]:
     # Perform named-entity recognition first
-    ner_processed_text, ne_positions = self.detectNamedEntity([text], 'correction')[0]
+    ner_processed_text, ne_positions, _ = self.detectNamedEntity([text], 'correction')[0]
     ne_positions = set(ne_positions)
     # Detect spelling errors
     err_positions, bert_predictions = self.detectSpellingError(ner_processed_text, 1e-5, 3)
