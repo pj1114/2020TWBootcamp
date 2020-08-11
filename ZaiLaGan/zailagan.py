@@ -6,6 +6,9 @@ from utilities.ner import *
 import re
 from pypinyin import lazy_pinyin
 from utilities.ngram import *
+import subprocess
+import os
+import ast
 
 class ZaiLaGan():
   # Initialize config, device, model, tokenizer, and utilities
@@ -405,3 +408,8 @@ class ZaiLaGan():
       correction = self.correctSpellingError(short_text[0], short_text[1], short_text[2], short_text[3], 10, 1.5)[0][0]
       corrections.append(correction)
     return (ner_processed_text, "".join(corrections))
+  
+  def getWordSub(self, text):
+    res = os.popen("conda run -n wordSub python ./utilities/wordSubJob.py "+ text).read()
+    dic = ast.literal_eval(res)
+    return dic

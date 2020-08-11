@@ -62,27 +62,27 @@ class wordSub():
 					else:
 						anti_word = []
 
-				candidates = [ele[0] for ele in self.model.most_similar(positive=[word])]
-				candidates = [ele for ele in candidates if 'V' in self.pos([[ele]])[0][0] 
-								and ele not in self.sys_dict(word)[1]
-									and ele not in anti_word]
+					candidates = [ele[0] for ele in self.model.most_similar(positive=[word])]
+					candidates = [ele for ele in candidates if 'V' in self.pos([[ele]])[0][0] 
+									and ele not in self.sys_dict(word)[1]
+										and ele not in anti_word]
 
-				cand_score_dict = dict()
-				for sub in candidates:
-					word_sentence_list_copied = word_sentence_list.copy()
-					word_sentence_list_copied[idx] = sub
-					cand_score_dict[sub]=self._getScore(''.join(word_sentence_list), ''.join(word_sentence_list_copied), self.model)
-				sorted_candidates = sorted([(i, cand_score_dict[i]) for i in candidates], key=lambda k:k[1])
+					cand_score_dict = dict()
+					for sub in candidates:
+						word_sentence_list_copied = word_sentence_list.copy()
+						word_sentence_list_copied[idx] = sub
+						cand_score_dict[sub]=self._getScore(''.join(word_sentence_list), ''.join(word_sentence_list_copied), self.model)
+					sorted_candidates = sorted([(i, cand_score_dict[i]) for i in candidates], key=lambda k:k[1])
 
-				max_score, min_score = 0,0
-				if len(sorted_candidates)!=0:
-					max_score = sorted_candidates[-1][1]
-					min_score = sorted_candidates[0][1]
-				new_candidates = [(i[0],(cand_score_dict[i[0]]-min_score)/(max_score-min_score)) for i in sorted_candidates
-									if 0.0< (cand_score_dict[i[0]]-min_score)/(max_score-min_score) < 0.5]
+					max_score, min_score = 0,0
+					if len(sorted_candidates)!=0:
+						max_score = sorted_candidates[-1][1]
+						min_score = sorted_candidates[0][1]
+					new_candidates = [(i[0],(cand_score_dict[i[0]]-min_score)/(max_score-min_score)) for i in sorted_candidates
+										if 0.0< (cand_score_dict[i[0]]-min_score)/(max_score-min_score) < 0.5]
 
-				if len(new_candidates)>0:
-					res_dict[start_idx] = (word, new_candidates)
+					if len(new_candidates)>0:
+						res_dict[start_idx] = (word, new_candidates)
 			start_idx += len(word)
 
 		return res_dict 

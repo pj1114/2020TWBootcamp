@@ -180,7 +180,7 @@ class NER():
                     except:
                         continue
 
-                if cnt==len(position):
+                if cnt==len(position) and len(position)!=0:
                     flag=1
                     return best, flag, position
                     
@@ -234,7 +234,7 @@ class NER():
                         else:
                             tmp.extend(list(range(j[2]+cumlen, j[3]+cumlen)))
                         if j[4] == 1:
-                            ner_pos[j[2]+cumlen] = (j[0], answer[idx][jdx][0])
+                            ner_pos[j[2]+cumlen] = (answer[idx][jdx][0], j[0])
                 all_data.append((new_sentence, tmp, ner_pos))
         elif task_name=='detection':
             for idx, i in enumerate(all_truth):
