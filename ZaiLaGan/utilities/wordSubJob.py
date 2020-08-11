@@ -1,4 +1,4 @@
-from utilities.wordSub import *
+from wordSub import *
 import yaml
 import sys
 

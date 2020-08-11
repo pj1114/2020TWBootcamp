@@ -21,3 +21,4 @@ pip3 install ckiptagger --upgrade
 pip3 install gensim --upgrade
 pip3 install opencc --upgrade
 pip3 install nltk --upgrade
+pip3 install pyemd --upgrade
