@@ -6,7 +6,9 @@ from utilities.ner import *
 import re
 from pypinyin import lazy_pinyin
 from utilities.ngram import *
-from utilities.wordSub import *
+import subprocess
+import os
+import ast
 
 class ZaiLaGan():
   # Initialize config, device, model, tokenizer, and utilities
@@ -31,7 +33,7 @@ class ZaiLaGan():
     self.charSet = self.utils.loadCharSet(self.config['Data']['common_char_set'])
     self.customConfusionDict = self.utils.loadCustomConfusion(self.config['Data']['confusion'])
     self.ngram_model = NGRAM(self.config["Model"]["ngram"])
-    self.wordSub_model = wordSub(self.config["Model"]["ws_model"], self.config["Model"]["pos_model"], self.config["Model"]["w2v_model"], self.config["Data"]["anti_dict"])
+    #self.wordSub_model = wordSub(self.config["Model"]["ws_model"], self.config["Model"]["pos_model"], self.config["Model"]["w2v_model"], self.config["Data"]["anti_dict"])
     #self.GEC = grammarErrorCorrector(self.config["Data"]["label_map"], self.config["Model"]["ngram"], self.config["Model"]["pos_model"])
 
   # Detect named-entities and return their corrections & positions
@@ -407,3 +409,7 @@ class ZaiLaGan():
       correction = self.correctSpellingError(short_text[0], short_text[1], short_text[2], short_text[3], 10, 1.5)[0][0]
       corrections.append(correction)
     return (ner_processed_text, "".join(corrections))
+  def getWordSub(self, text):
+    res = os.popen("conda run -n wordSub python wordSubJob.py "+ text).read()
+    dic = ast.literal_eval(res)
+    return dic
