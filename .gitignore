@@ -131,3 +131,9 @@ dmypy.json
 # Mac
 .idea/
 .Ds_store
+
+# Directories
+**/ZaiLaGan/models
+
+# Other
+**/ngrok
