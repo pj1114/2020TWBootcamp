@@ -313,14 +313,14 @@ spelling_error_correction_output_correction_span_template = {
   "type": "span",
   "text": "placeholder",
   "size": "sm",
-  "color": "#CD4F39"
+  "color": "#175752"
 }
 spelling_error_correction_output_typo_span_template = {
   "type": "span",
   "text": "placeholder",
   "size": "sm",
   "decoration": "line-through",
-  "weight": "bold"
+  "color": "#CD4F39"
 }
 carousel_menu = {
   "type": "carousel",
