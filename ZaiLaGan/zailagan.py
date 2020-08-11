@@ -106,7 +106,6 @@ class ZaiLaGan():
             ssc_score = self.ner_model.ssc.computeSoundCodeSimilarity(ssc_target, ssc_pred)
             if ssc_score >= 0.7 :
               starting_positions[err_position][1].add(predicted_token)
-
     # Construct candidate sentences
     candidates = []
     prefixes = list(starting_positions[0][0])
@@ -143,6 +142,7 @@ class ZaiLaGan():
     recommendations.sort(key = lambda x: x[2])
     return recommendations
 
+  # Find spelling error correction candidates from dictionary
   def generate_correction_cand(self, word):
     correction_candidates = []
     if len(word) == 1:
@@ -184,6 +184,7 @@ class ZaiLaGan():
         
     return correction_candidates
 
+  # Detect and correct spelling errors given input text
   def bertDetectAndCorrect(self, text: str, topk: int, ner_pos_list: List[int]) -> Tuple[str, List[int]]:
     positions = []
     text_list = list(text)
@@ -265,111 +266,6 @@ class ZaiLaGan():
     # return corrected string and error position list
     return (''.join(text_list), sorted(list(set(positions))) )
 
-  def bertDetectAndCorrectHelper(self, text: str, topk: int, ner_pos_list: List[int]) -> Tuple[str, List[int]]:
-    positions = []
-    text_list = list(text)
-    for idx, single_word in enumerate(text):
-      if self.utils.isChineseChar(single_word):
-        if idx not in ner_pos_list:
-          # bert-based model generates topk candidates 
-          masked_text = "[CLS]" + text[:idx] + "[MASK]" + text[idx+1:] + "[SEP]"
-          tokenized_masked_text = self.bert_base_tokenizer.tokenize(masked_text)
-          token_ids = torch.tensor([self.bert_base_tokenizer.convert_tokens_to_ids(tokenized_masked_text)])
-          segment_ids = torch.tensor([[0] * token_ids.shape[1]])
-          token_ids = token_ids.to(self.device)
-          segment_ids = segment_ids.to(self.device)
-          with torch.no_grad():
-            outputs = self.bert_base_model(token_ids, token_type_ids = segment_ids)
-            scores = outputs[0][0,idx+1]
-            token_probability = torch.nn.Softmax(0)(scores)[self.bert_base_tokenizer.convert_tokens_to_ids(text[idx])]
-            scores_list = torch.nn.Softmax(0)(scores)
-            _, pred = scores_list.topk(topk, 0, True, True)
-            topk_bert_candidates = [self.bert_base_tokenizer.convert_ids_to_tokens(ele.item()) for ele in pred]
-
-          if topk_bert_candidates and (single_word not in topk_bert_candidates):
-            candidates = self.generate_correction_cand(text[idx])
-            candidates_sorted = sorted(candidates, key=lambda k: self.dict_trie.getWordFreq(k), reverse=True)
-            if candidates_sorted:
-              for topk_bert_cand in topk_bert_candidates:
-                if topk_bert_cand in candidates_sorted:
-                  #print(['- '+single_word, '+ '+topk_bert_cand + '_'+str(start_idx+idx)])
-                  text_list[idx] = topk_bert_cand
-                  positions.append(idx)
-                  single_word = topk_bert_cand
-                  break
-                    
-    for n in [2, 3, 4, 5]:
-      for idx in range(len(text) - n + 1):
-        if not ner_pos_list or (ner_pos_list and (idx > ner_pos_list[-1] or idx+n < ner_pos_list[0])):
-          if self.utils.isChineseChar(text[idx]):
-            word = text[idx: idx+n]
-            # bert-based model generates topk candidates 
-            masked_text = "[CLS]" + text[:idx] + "[MASK]" + text[idx+1:] + "[SEP]"
-            tokenized_masked_text = self.bert_base_tokenizer.tokenize(masked_text)
-            token_ids = torch.tensor([self.bert_base_tokenizer.convert_tokens_to_ids(tokenized_masked_text)])
-            segment_ids = torch.tensor([[0] * token_ids.shape[1]])
-            token_ids = token_ids.to(self.device)
-            segment_ids = segment_ids.to(self.device)
-            with torch.no_grad():
-              outputs = self.bert_base_model(token_ids, token_type_ids = segment_ids)
-              scores = outputs[0][0,idx+1]
-              token_probability = torch.nn.Softmax(0)(scores)[self.bert_base_tokenizer.convert_tokens_to_ids(text[idx])]
-              scores_list = torch.nn.Softmax(0)(scores)
-              _, pred = scores_list.topk(topk, 0, True, True)
-              topk_bert_candidates = [self.bert_base_tokenizer.convert_ids_to_tokens(ele.item()) for ele in pred]
-
-            candidates = self.generate_correction_cand(word)
-            candidates = [ele for ele in candidates if self.dict_trie.getWordFreq(ele)>0]
-            if candidates:
-              for topk_bert_cand in topk_bert_candidates:
-                tmp_word = topk_bert_cand + word[1:]
-                if tmp_word in candidates and tmp_word!= word:
-                  #print(['- '+short_text[idx], '+ '+topk_bert_cand + '_'+str(start_idx+idx)])
-                  text_list[idx] = topk_bert_cand
-                  positions.append(idx)
-                  break
-    return (''.join(text_list), sorted(list(set(positions))) )
-
-  def contextErrDetectAndCorrect(self, text: str) -> Tuple[str, List[int]]:
-    ner_processed_text, ne_positions = self.detectNamedEntity([text])[0]
-    ne_positions = set(ne_positions)
-    
-    positions = []
-    corrected_text = ''
-    text_list = list(text)
-    # split input text into short texts
-    re_punctuation = re.compile("([\u4E00-\u9FD5a-zA-Z0-9+#&]+)", re.U)
-    short_texts = []
-    components = re_punctuation.split(text)
-    components = list(filter(('').__ne__, components))
-    
-    start_idx = 0
-    punc = []
-    for comp in components:
-      if re_punctuation.match(comp):
-        short_texts.append((comp, start_idx))
-        start_idx += len(comp)
-        start_idx += 1
-      else:
-        punc.append(comp)
-    
-    for index, (short_text, start_idx) in enumerate(short_texts):
-      if len(short_text) < 15:
-        recommendation, err_positions = self.bertDetectAndCorrectHelper(short_text, 3, list(ne_positions))
-        corrected_text += recommendation
-        corrected_text += punc[index]
-        positions += err_positions
-      else:
-        err_positions, bert_predictions = self.detectSpellingError(short_text, 8e-3, 3)
-        err_positions = set(err_positions)
-        non_ne_err_count = 0
-        positions += err_positions
-        shift_ne_positions = {ele-start_idx for ele in ne_positions}
-        corrected_text += self.correctSpellingError(short_text, err_positions, bert_predictions, shift_ne_positions, 5, 2.5)[0][0]
-        corrected_text += punc[index]
-    positions += list(ne_positions)
-    return (corrected_text, list(set(positions)))
-
   # Divide a long text into multiple parts and correct spelling errors separately
   def divideAndCorrectSpellingError(self, text: str) -> Tuple[str, str]:
     # Perform named-entity recognition first
@@ -409,6 +305,7 @@ class ZaiLaGan():
       corrections.append(correction)
     return (ner_processed_text, "".join(corrections))
   
+  # Get substitution words
   def getWordSub(self, text):
     res = os.popen("conda run -n wordSub python ./utilities/wordSubJob.py "+ text).read()
     dic = ast.literal_eval(res)
