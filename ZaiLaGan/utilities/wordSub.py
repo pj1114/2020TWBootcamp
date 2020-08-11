@@ -78,8 +78,11 @@ class wordSub():
 					if len(sorted_candidates)!=0:
 						max_score = sorted_candidates[-1][1]
 						min_score = sorted_candidates[0][1]
-					new_candidates = [(i[0],(cand_score_dict[i[0]]-min_score)/(max_score-min_score)) for i in sorted_candidates
-										if 0.0< (cand_score_dict[i[0]]-min_score)/(max_score-min_score) < 0.5]
+					if max_score-min_score == 0:
+						new_candidates = []
+					else:
+						new_candidates = [(i[0],(cand_score_dict[i[0]]-min_score)/(max_score-min_score)) for i in sorted_candidates
+											if 0.0< (cand_score_dict[i[0]]-min_score)/(max_score-min_score) < 0.5]
 
 					if len(new_candidates)>0:
 						res_dict[start_idx] = (word, new_candidates)
