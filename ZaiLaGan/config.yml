@@ -1,10 +1,25 @@
+User:
+  user_path: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan
 Linebot:
-  access_token: M0tb09mdq8bGe9X5nIEnxU6XaKTVSv/BnMcQ5VndMjrt6SbJXzxcCeu5Ke5hsbGl+Yks70NcLzQKHqKRZJNpO+DdNbjxXidcR21kSgsdf62Is18y16sOYCCwhJGiT8eGk+Ujg0/1+1RPegC4X2kpCAdB04t89/1O/w1cDnyilFU=
-  secret: 6ebc8d1f30c6a9d6de041e8a59a5cff2
+  access_token: C5m+zW/LnOmUr3SBI5rgzPCUUUAF0YlaXa0WrTnVzDaAzL1jsh7i4mAsLufVF6G99vtW+KzWXvMZOUsx6WEtylKl8dQ4vtaYfUJF1G3kb9qF5juIacIntP4qoW9EjchVj17WwL1qhNWzFTj+CGbr9QdB04t89/1O/w1cDnyilFU=
+  secret: 8394f386b022f82de1b2925c51487dbf
 Model:
   bert_wwm_ext_chinese: hfl/chinese-bert-wwm-ext
-  gpt2_chinese: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/models/gpt2_chinese/prose_wiki_novel_finetuned
+  bert_base_chinese: bert-base-chinese
+  gpt2_chinese: models/gpt2_chinese/prose_wiki_novel_finetuned
+  ner: utilities/NER/NER_data/data_path
+  ngram: models/5gram/language_wiki_5gram.model
+  w2v_model: models/word2vec/word2vec.model
+  ws_model: models/ckip
+  pos_model: models/ckip
 Data:
-  pinyin: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/pinyin.txt
-  stroke: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/spelling_error/stroke.txt
-  dictionary: /Users/patrick/desktop/Cinnamon AI/src/2020TWBootcamp/ZaiLaGan/data/word_dictionary/word_jieba.txt
+  pinyin: data/spelling_error/pinyin.pkl
+  stroke: data/spelling_error/stroke.pkl
+  dictionary: data/word_dictionary/word_jieba.txt
+  common_char_set: data/spelling_error/common_char_set.txt
+  confusion: data/spelling_error/confusion.txt
+  place: data/ner/place.txt
+  person: data/ner/person.txt 
+  ssc: data/ner/sound_shape_code
+  anti_dict: data/word_sub/antisem.txt
+  label_map: data/grammar_error/label_map.txt

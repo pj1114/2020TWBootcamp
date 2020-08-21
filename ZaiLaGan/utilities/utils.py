@@ -2,7 +2,10 @@ from typing import *
 import torch
 from transformers import BertTokenizer, GPT2LMHeadModel
 from .trie import Trie
+import codecs
+import pickle
 
+# Utility functions
 class Utils:
 	# Initialize config, device, model, and tokenizer
 	def __init__(self, config):
@@ -18,15 +21,15 @@ class Utils:
 		word_dict = {}
 		with open(path, "r") as dict_file:
 			if(hasFrequency):
-			 	for word in dict_file:
-			 		word = word.split()
-			 		if(word[0] in word_dict):
-			 			word_dict[word[0]] += word[1]
-			 		else:
-			 			word_dict[word[0]] = word[1]
+				for word in dict_file:
+					word = word.split()
+					if(word[0] in word_dict):
+						word_dict[word[0]] += word[1]
+					else:
+						word_dict[word[0]] = word[1]
 			else:
 				for word in dict_file:
-			 		word_dict[word] = -1
+					word_dict[word] = -1
 		return word_dict
 
 	# Load word dictionary and convert it into trie (with word frequency if specified)
@@ -35,24 +38,56 @@ class Utils:
 		dictionary = self.loadDictionary(path, hasFrequency)
 		for word, frequency in dictionary.items():
 			trie.addWord(word, frequency)
+		return trie
 
 	# Load token-level similar stroke dictionary
 	def loadStroke(self, path: str) -> Dict[str,List[str]]:
-		stroke_dict = {}
-		with open(path, "r") as stroke_file:
-			for line in stroke_file:
-				line = line.replace(" ", "").replace("\t", "").replace("\n", "")
-				stroke_dict[line[0]] = list(line[1:])
+		with open(path, "rb") as stroke_file:
+			stroke_dict = pickle.load(stroke_file)
 		return stroke_dict
 
 	# Load token-level similar pinyin dictionary
 	def loadPinYin(self, path: str) -> Dict[str,List[str]]:
-		pinyin_dict = {}
-		with open(path, "r") as pinyin_file:
-			for line in pinyin_file:
-				line = line.replace(" ", "").replace("\t", "").replace("\n", "")
-				pinyin_dict[line[0]] = list(line[1:])
+		with open(path, "rb") as pinyin_file:
+			pinyin_dict = pickle.load(pinyin_file)
 		return pinyin_dict
+
+	# Load common character set
+	def loadCharSet(self, path: str) -> set:
+		chars_set = set()
+		with open(path, 'r', encoding='utf-8') as char_set_file:
+			for char in char_set_file:
+				chars_set.add(char.replace('\n', ''))
+		return chars_set
+
+	# Load custom confusion dict
+	def loadCustomConfusion(self, path: str) -> Dict[str,str]:
+		custom_confusion_dict = dict()
+		with open(path, "r") as file:
+			for line in file:
+				line = line.replace('\n', '').split('\t')
+				custom_confusion_dict[line[0]] = line[1]
+		return custom_confusion_dict
+
+	# Load place's named-entity dictionary
+	def loadPlace(self, path: str) -> List[str]:
+		place_lst = []
+		with codecs.open(path, 'r', encoding = 'utf-8') as place_file:
+			for line in place_file:
+				line = line.strip()
+				place = line.split('\t')[0]
+				place_lst.append(place)
+		return place_lst
+
+	# Load person's named-entity dictionary
+	def loadPerson(self, path: str) -> List[str]:
+		person_lst = []
+		with codecs.open(path, 'r', encoding = 'utf-8') as person_file:
+			for line in person_file:
+				line = line.strip()
+				person = line.split('\t')[0]
+				person_lst.append(person)
+		return person_lst
 
 	# Compute the perplexity of a sentence with language model
 	def getSentencePpl(self, sentence: str) -> float:
@@ -65,3 +100,755 @@ class Utils:
 			outputs = self.gpt2_model(token_ids, labels = token_ids)
 			loss = outputs[0]
 			return pow(2, loss.item())
+
+	# Check if a character is a chinese character
+	def isChineseChar(self, character: str) -> bool:
+		if('\u4e00' <= character <= '\u9fff'):
+			return True
+		else:
+			return False
+
+# Utility variables
+spelling_error_detection_reply_template = {
+  "type": "bubble",
+  "size": "kilo",
+  "body": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "text",
+        "text": "文本偵錯結果",
+        "weight": "bold",
+        "style": "normal",
+        "size": "md",
+        "color": "#1DB446"
+      },
+      {
+        "type": "text",
+        "text": "Spelling Error Detection Result",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "sm",
+        "color": "#aaaaaa"
+      },
+      {
+        "type": "separator",
+        "margin": "lg"
+      },
+      {
+        "type": "text",
+        "text": "輸入",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "lg",
+        "color": "#5299CB"
+      },
+      {
+        "type": "text",
+        "text": "Input",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "sm",
+        "color": "#aaaaaa"
+      },
+      {
+        "type": "text",
+        "text": "placeholder",
+        "weight": "regular",
+        "style": "normal",
+        "size": "sm",
+        "margin": "sm",
+        "wrap": True
+      },
+      {
+        "type": "separator",
+        "margin": "lg"
+      },
+      {
+        "type": "text",
+        "text": "輸出",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "lg",
+        "color": "#5299CB"
+      },
+      {
+        "type": "text",
+        "text": "Output",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "sm",
+        "color": "#aaaaaa"
+      },
+      {
+        "type": "text",
+        "contents": [
+          {
+            "type": "span",
+            "text": "placeholder",
+            "size": "sm"
+          }
+        ],
+        "margin": "sm",
+        "wrap": True
+      }
+    ]
+  }
+}
+spelling_error_detection_output_span_template = {
+  "type": "span",
+  "text": "placeholder",
+  "size": "sm"
+}
+spelling_error_detection_output_error_span_template = {
+  "type": "span",
+  "text": "placeholder",
+  "size": "sm",
+  "color": "#CD4F39"
+}
+spelling_error_correction_reply_template = {
+  "type": "bubble",
+  "size": "kilo",
+  "body": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "text",
+        "text": "文本修正結果",
+        "weight": "bold",
+        "style": "normal",
+        "size": "md",
+        "color": "#1DB446"
+      },
+      {
+        "type": "text",
+        "text": "Spelling Error Correction Result",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "sm",
+        "color": "#aaaaaa"
+      },
+      {
+        "type": "separator",
+        "margin": "lg"
+      },
+      {
+        "type": "text",
+        "text": "輸入",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "lg",
+        "color": "#5299CB"
+      },
+      {
+        "type": "text",
+        "text": "Input",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "sm",
+        "color": "#aaaaaa"
+      },
+      {
+        "type": "text",
+        "text": "placeholder",
+        "weight": "regular",
+        "style": "normal",
+        "size": "sm",
+        "margin": "sm",
+        "wrap": True
+      },
+      {
+        "type": "separator",
+        "margin": "lg"
+      },
+      {
+        "type": "text",
+        "text": "輸出",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "lg",
+        "color": "#5299CB"
+      },
+      {
+        "type": "text",
+        "text": "Output",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "sm",
+        "color": "#aaaaaa"
+      },
+      {
+        "type": "text",
+        "contents": [
+          {
+            "type": "span",
+            "text": "placeholder",
+            "size": "sm"
+          }
+        ],
+        "margin": "sm",
+        "wrap": True
+      }
+    ]
+  }
+}
+spelling_error_correction_output_span_template = {
+  "type": "span",
+  "text": "placeholder",
+  "size": "sm"
+}
+spelling_error_correction_output_correction_span_template = {
+  "type": "span",
+  "text": "placeholder",
+  "size": "sm",
+  "color": "#175752"
+}
+spelling_error_correction_output_typo_span_template = {
+  "type": "span",
+  "text": "placeholder",
+  "size": "sm",
+  "decoration": "line-through",
+  "color": "#CD4F39"
+}
+synonym_recommendation_reply_template = {
+  "type": "bubble",
+  "size": "mega",
+  "body": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "text",
+        "text": "近似詞推薦結果",
+        "weight": "bold",
+        "style": "normal",
+        "size": "md",
+        "color": "#1DB446"
+      },
+      {
+        "type": "text",
+        "text": "Synonym Recommendation Result",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "sm",
+        "color": "#aaaaaa"
+      },
+      {
+        "type": "separator",
+        "margin": "lg"
+      },
+      {
+        "type": "text",
+        "text": "輸入",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "lg",
+        "color": "#5299CB"
+      },
+      {
+        "type": "text",
+        "text": "Input",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "sm",
+        "color": "#aaaaaa"
+      },
+      {
+        "type": "text",
+        "text": "placeholder",
+        "weight": "regular",
+        "style": "normal",
+        "size": "sm",
+        "margin": "sm",
+        "wrap": True
+      },
+      {
+        "type": "separator",
+        "margin": "lg"
+      },
+      {
+        "type": "text",
+        "text": "輸出",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "lg",
+        "color": "#5299CB"
+      },
+      {
+        "type": "text",
+        "text": "Output",
+        "weight": "bold",
+        "style": "normal",
+        "size": "sm",
+        "margin": "sm",
+        "color": "#aaaaaa"
+      },
+      {
+        "type": "text",
+        "contents": [
+          {
+            "type": "span",
+            "text": "placeholder",
+            "size": "sm"
+          }
+        ],
+        "margin": "sm",
+        "wrap": True
+      }
+    ]
+  }
+}
+synonym_recommendation_output_span_template = {
+  "type": "span",
+  "text": "placeholder",
+  "size": "sm"
+}
+synonym_recommendation_output_original_span_template = {
+  "type": "span",
+  "text": "placeholder",
+  "size": "sm",
+  "color": "#CD4F39"
+}
+synonym_recommendation_output_recommendation_span_template = {
+  "type": "span",
+  "text": "placeholder",
+  "size": "sm",
+  "color": "#175752"
+}
+carousel_menu = {
+  "type": "carousel",
+  "contents": [
+    {
+      "type": "bubble",
+      "size": "kilo",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "文本偵錯",
+            "color": "#ffffff",
+            "align": "start",
+            "size": "xl",
+            "gravity": "center",
+            "decoration": "none",
+            "weight": "bold",
+            "wrap": True
+          },
+          {
+            "type": "text",
+            "text": "Spelling Error Detection",
+            "color": "#ffffff",
+            "align": "start",
+            "size": "md",
+            "gravity": "center",
+            "margin": "lg",
+            "weight": "regular",
+            "wrap": True
+          }
+        ],
+        "backgroundColor": "#27ACB2",
+        "paddingTop": "19px",
+        "paddingAll": "12px",
+        "paddingBottom": "25px",
+        "margin": "none"
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Introduction: ",
+                "color": "#8C8C8C",
+                "size": "sm",
+                "wrap": True
+              },
+              {
+                "type": "text",
+                "text": "幫助使用者於文本中自動偵測錯字，節省使用者大量的時間",
+                "wrap": True,
+                "margin": "lg"
+              },
+              {
+                "type": "text",
+                "text": "A spelling error detection machine for users intending to look for typos in their articles",
+                "wrap": True,
+                "margin": "lg"
+              }
+            ],
+            "flex": 1,
+            "height": "230px"
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Detect",
+                "action": {
+                  "type": "message",
+                  "label": "Detect",
+                  "text": "***SpellingErrorDetection***"
+                },
+                "color": "#1093d4",
+                "position": "relative",
+                "decoration": "none",
+                "style": "normal",
+                "weight": "regular",
+                "align": "center",
+                "offsetTop": "3px"
+              }
+            ],
+            "borderColor": "#1093d4",
+            "borderWidth": "1px",
+            "cornerRadius": "5px",
+            "height": "30px"
+          }
+        ],
+        "spacing": "md",
+        "paddingAll": "12px",
+        "height": "300px"
+      },
+      "styles": {
+        "footer": {
+          "separator": False
+        }
+      }
+    },
+    {
+      "type": "bubble",
+      "size": "kilo",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "文本修正",
+            "color": "#ffffff",
+            "align": "start",
+            "size": "xl",
+            "gravity": "center",
+            "decoration": "none",
+            "weight": "bold",
+            "wrap": True
+          },
+          {
+            "type": "text",
+            "text": "Spelling Error Correction",
+            "color": "#ffffff",
+            "align": "start",
+            "size": "md",
+            "gravity": "center",
+            "margin": "lg",
+            "weight": "regular",
+            "wrap": True
+          }
+        ],
+        "backgroundColor": "#FF6B6E",
+        "paddingTop": "19px",
+        "paddingAll": "12px",
+        "paddingBottom": "25px",
+        "margin": "none"
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Introduction: ",
+                "color": "#8C8C8C",
+                "size": "sm",
+                "wrap": True
+              },
+              {
+                "type": "text",
+                "text": "幫助使用者於文本中自動改正錯字，節省使用者大量的時間",
+                "wrap": True,
+                "margin": "lg"
+              },
+              {
+                "type": "text",
+                "text": "A spelling error correction machine for users intending to correct typos automatically in their articles",
+                "wrap": True,
+                "margin": "lg"
+              }
+            ],
+            "flex": 1,
+            "height": "230px"
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Correct",
+                "action": {
+                  "type": "message",
+                  "label": "Correct",
+                  "text": "***SpellingErrorCorrection***"
+                },
+                "color": "#1093d4",
+                "position": "relative",
+                "decoration": "none",
+                "style": "normal",
+                "weight": "regular",
+                "align": "center",
+                "offsetTop": "3px"
+              }
+            ],
+            "borderColor": "#1093d4",
+            "borderWidth": "1px",
+            "cornerRadius": "5px",
+            "height": "30px"
+          }
+        ],
+        "spacing": "md",
+        "paddingAll": "12px",
+        "height": "300px"
+      },
+      "styles": {
+        "footer": {
+          "separator": False
+        }
+      }
+    },
+    {
+      "type": "bubble",
+      "size": "kilo",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "文法小老師",
+            "color": "#ffffff",
+            "align": "start",
+            "size": "xl",
+            "gravity": "center",
+            "decoration": "none",
+            "weight": "bold",
+            "wrap": True
+          },
+          {
+            "type": "text",
+            "text": "Grammar Tutor",
+            "color": "#ffffff",
+            "align": "start",
+            "size": "md",
+            "gravity": "center",
+            "margin": "lg",
+            "weight": "regular",
+            "wrap": True
+          }
+        ],
+        "backgroundColor": "#A17DF5",
+        "paddingTop": "19px",
+        "paddingAll": "12px",
+        "paddingBottom": "25px",
+        "margin": "none"
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Introduction: ",
+                "color": "#8C8C8C",
+                "size": "sm",
+                "wrap": True
+              },
+              {
+                "type": "text",
+                "text": "幫助中文學習者改正短句中的錯別字及文法，增進學習效率",
+                "wrap": True,
+                "margin": "lg"
+              },
+              {
+                "type": "text",
+                "text": "A tool for Chinese learners to correct grammatical errors and typos to help them learn the proper usages",
+                "wrap": True,
+                "margin": "lg"
+              }
+            ],
+            "flex": 1,
+            "height": "230px"
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Start",
+                "action": {
+                  "type": "message",
+                  "label": "Start",
+                  "text": "***GrammarErrorCorrection***"
+                },
+                "color": "#1093d4",
+                "position": "relative",
+                "decoration": "none",
+                "style": "normal",
+                "weight": "regular",
+                "align": "center",
+                "offsetTop": "3px"
+              }
+            ],
+            "borderColor": "#1093d4",
+            "borderWidth": "1px",
+            "cornerRadius": "5px",
+            "height": "30px"
+          }
+        ],
+        "spacing": "md",
+        "paddingAll": "12px",
+        "height": "300px"
+      },
+      "styles": {
+        "footer": {
+          "separator": False
+        }
+      }
+    },
+    {
+      "type": "bubble",
+      "size": "kilo",
+      "header": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "近似詞推薦",
+            "color": "#ffffff",
+            "align": "start",
+            "size": "xl",
+            "gravity": "center",
+            "decoration": "none",
+            "weight": "bold",
+            "wrap": True
+          },
+          {
+            "type": "text",
+            "text": "Synonym Recommendation",
+            "color": "#ffffff",
+            "align": "start",
+            "size": "md",
+            "gravity": "center",
+            "margin": "lg",
+            "weight": "regular",
+            "wrap": True
+          }
+        ],
+        "backgroundColor": "#0367D3",
+        "paddingTop": "19px",
+        "paddingAll": "12px",
+        "paddingBottom": "25px",
+        "margin": "none"
+      },
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Introduction: ",
+                "color": "#8C8C8C",
+                "size": "sm",
+                "wrap": True
+              },
+              {
+                "type": "text",
+                "text": "幫助使用者尋找文本中詞語的近似替換詞，增添文本的色彩",
+                "wrap": True,
+                "margin": "lg"
+              },
+              {
+                "type": "text",
+                "text": "A tool for users to look for synonyms to substitute for repetitive words in their articles",
+                "wrap": True,
+                "margin": "lg"
+              }
+            ],
+            "flex": 1,
+            "height": "230px"
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Recommend",
+                "action": {
+                  "type": "message",
+                  "label": "Recommend",
+                  "text": "***SynonymRecommendation***"
+                },
+                "color": "#1093d4",
+                "position": "relative",
+                "decoration": "none",
+                "style": "normal",
+                "weight": "regular",
+                "align": "center",
+                "offsetTop": "3px"
+              }
+            ],
+            "borderColor": "#1093d4",
+            "borderWidth": "1px",
+            "cornerRadius": "5px",
+            "height": "30px"
+          }
+        ],
+        "spacing": "md",
+        "paddingAll": "12px",
+        "height": "300px"
+      },
+      "styles": {
+        "footer": {
+          "separator": False
+        }
+      }
+    }
+  ]
+}
